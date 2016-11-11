@@ -100,10 +100,8 @@ PPplot = function(score, label, pi0 = 0,title = 'PP plot of target PSMs' ,
 
 plot_diag = function(df){
   df = mutate(df,subset = subset == 1,decoy = decoy ==1)
-  cat('check  ', str(df))
   dfsub = filter(df,subset)
   dfdec = filter(df,decoy)
-  cat('check  ', str(df))
   
   p1 =  pi0plot(sum(!dfsub$decoy),sum(dfsub$decoy))
   
@@ -122,51 +120,90 @@ plot_diag = function(df){
               xlab = 'Subset decoy percentile')
   
   p_all = cowplot::plot_grid(p1,p2,p3,p4, align = 'v',labels = 'auto',hjust = -4, label_size = 16)
-  print(p_all)
+  #print(p_all)
   return(list(pi0plot = p1, decoyall_targetsubset = p2,
               decoyall_decoy_subset = p3, decoysubset_target_subset = p4, all = p_all))
 }
 
 
-simulate_subset = function(n_target = 200,n_decoy = 40,n_decoy_large = 2000,
-                            H0_mean=2.75, H1_mean=3.31,H0_sd=.13,H1_sd=.28,
-                           decoy_mean = H0_mean, decoy_sd = H0_sd,
-                           decoy_large_mean = H0_mean, decoy_subset_sd = H0_sd){
-  pi_0D = 2*par$pi_0/(1+par$pi_0)
-  par$n_decoy = rbinom(1,par$n_all_min,.5)
-  par$ns_H0 = rbinom(1,par$n,par$pi_0D)
-  par$ns_decoy =rbinom(1,par$ns_H0,.5)
-  par$ns_target = par$n-par$ns_decoy
-  
-  decoys = rnorm(par$n_decoy,par$decoy_mean,par$decoy_sd)
-  
-  par$sim = data_frame(x = decoys,
-                     decoy = TRUE,
-                     H0 = TRUE,
-                     subset = c(rep(TRUE,par$ns_decoy),rep(FALSE,par$n_decoy - par$ns_decoy)))
-  
-  ns_target_H0 = par$ns_H0 - par$ns_decoy
-  if (ns_target_H0 > 0) {
-    par$sim = bind_rows(par$sim,
-                      data_frame(x = rnorm(ns_target_H0,par$H0_mean,par$H0_sd),
-                                 decoy = FALSE,
-                                 H0 = TRUE,
-                                 subset = TRUE))
-  }
-  ns_target_H1 = par$n-par$ns_H0
-  if (ns_target_H1 > 0) {
-    par$sim = bind_rows(par$sim,
-                      data_frame(x = rnorm(ns_target_H1,par$H1_mean,par$H1_sd),
-                                 decoy = FALSE,
-                                 H0 = FALSE,
-                                 subset = TRUE))
-  }
-  d
+# pi_0D = 2*par$pi_0/(1+par$pi_0)
+# par$n_decoy = rbinom(1,par$n_all_min,.5)
+# par$ns_H0 = rbinom(1,par$n,par$pi_0D)
+# par$ns_decoy =rbinom(1,par$ns_H0,.5)
+# par$ns_target = par$n-par$ns_decoy
+
+
+sample_dataset = function(H1_n = 160,H0_n = 40, decoy_n = H0_n ,decoy_large_n = 2000,
+                          H0_mean=2.75, H1_mean=3.31,H0_sd=.13,H1_sd=.28,
+                          decoy_mean = H0_mean, decoy_sd = H0_sd,
+                          decoy_large_mean = H0_mean, decoy_large_sd = H0_sd){
+  bind_rows(
+    data_frame(score = rnorm(decoy_large_n,decoy_large_mean,decoy_large_sd),
+               decoy = TRUE,
+               H0 = FALSE,
+               subset = FALSE)
+    ,
+    data_frame(score = rnorm(decoy_n,decoy_mean,decoy_sd),
+               decoy = TRUE,
+               H0 = FALSE,
+               subset = TRUE)
+    ,
+    data_frame(score = rnorm(H0_n,H0_mean,H0_sd),
+               decoy = FALSE,
+               H0 = TRUE,
+               subset = TRUE)
+    ,
+    data_frame(score = rnorm(H1_n,H1_mean,H1_sd),
+               decoy = FALSE,
+               H0 = FALSE,
+               subset = TRUE)
+  )
 }
 
 
+plot_theo_dist = function(H1_n = 160,H0_n = 40, decoy_n = H0_n ,decoy_large_n = 2000,
+                                 H0_mean=2.75, H1_mean=3.31,H0_sd=.13,H1_sd=.28,
+                          decoy_mean = H0_mean, decoy_sd = H0_sd,
+                          decoy_large_mean = H0_mean, decoy_large_sd = H0_sd){
 
+    ## make grid of scores
+  d = data_frame(score = seq(1,5,.01))
+  ## calculate theoretical density for eacht dist
 
+  p_H0 = H0_n/(H0_n + H1_n)
+  p_H1 = H1_n/(H0_n + H1_n)
+  p_decoy_large = p_H0 * decoy_large_n/(decoy_n + decoy_large_n)
+  p_decoy = p_H0 * decoy_n/(decoy_n + decoy_large_n)
+
+ d = bind_rows(
+    mutate(d,dens = p_decoy_large * dnorm(score,decoy_large_mean,decoy_large_sd),
+               dist = 'decoy_large')
+    ,
+    mutate(d,dens = p_decoy * dnorm(score,decoy_mean,decoy_sd),
+           dist = 'decoy')
+    ,
+    mutate(d,dens = p_H0 * dnorm(score,H0_mean,H0_sd),
+           dist = 'H0')
+    ,
+    mutate(d,dens = p_H1 * dnorm(score,H1_mean,H1_sd),
+           dist = 'H1')
+    ,
+    mutate(d,dens = p_decoy * dnorm(score,decoy_mean,decoy_sd) + 
+             p_decoy_large * dnorm(score,decoy_large_mean,decoy_large_sd),
+           dist = 'decoy_all')
+    ,
+    mutate(d,dens = p_H0 * dnorm(score,H0_mean,H0_sd) + 
+             p_H1 * dnorm(score,H1_mean,H1_sd),
+           dist = 'target')
+  )
+  
+  p1 = ggplot(d,aes(score,dens,col = dist)) + geom_line() +
+    labs(x = 'Score',y = 'Density',colour= '') +
+    theme(axis.title = element_text(size = rel(1.2)), axis.title.y = element_text(angle = 0),
+          legend.position = 'top')
+  print(p1)
+  list(data = d,plot = p1)
+  }
 
 
 # d = read.csv('/home/adriaan/Dropbox/paper_subset/revision/Rpackage/cytoplasm.csv',sep = ',')
