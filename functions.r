@@ -82,11 +82,7 @@ pi0plot = function(n_targets, n_decoys) {
 
 PPplot = function(score, label, pi0 = 0,title = 'PP plot of target PSMs' ,
                   xlab = 'Decoy percentile' ,ylab = 'Target\npercentile'){
-  Ft = ecdf(score[!label])
-  Fd = ecdf(score[label])
-  x = score[!label]
-  df = data_frame(Fdp = Fd(x), Ftp = Ft(x))
-  ggplot(df,aes(Fdp,Ftp)) + geom_point(,color = 'dark grey') +
+  p = ggplot()  +
     geom_abline(slope = pi0,color = 'black') +
     labs(x = xlab, y = ylab ,title = title) +
     xlim(0,1) + ylim(0,1) +
@@ -96,7 +92,18 @@ PPplot = function(score, label, pi0 = 0,title = 'PP plot of target PSMs' ,
       axis.title = element_text(size = rel(1.2)),
       axis.text = element_text(size = rel(1.2)),
       axis.title.y = element_text(angle = 0))
+  
+  if ((length(score[!label]) == 0) | (length(score[label]) == 0)) 
+    return(p + annotate('text',label = 'NOT ENOUGH DATA TO PLOT',x = .5,y = .5))
+  
+  Ft = ecdf(score[!label])
+  Fd = ecdf(score[label])
+  x = score[!label]
+  df = data_frame(Fdp = Fd(x), Ftp = Ft(x))
+  
+  p + geom_point(data = df,aes(Fdp,Ftp),color = 'dark grey')
 }
+
 
 plot_diag = function(df){
   df = mutate(df,subset = subset == 1,decoy = decoy ==1)
@@ -125,40 +132,50 @@ plot_diag = function(df){
               decoyall_decoy_subset = p3, decoysubset_target_subset = p4, all = p_all))
 }
 
-
-# pi_0D = 2*par$pi_0/(1+par$pi_0)
-# par$n_decoy = rbinom(1,par$n_all_min,.5)
-# par$ns_H0 = rbinom(1,par$n,par$pi_0D)
-# par$ns_decoy =rbinom(1,par$ns_H0,.5)
-# par$ns_target = par$n-par$ns_decoy
-
+simulate_subset = function(n,pi0,sims = 1){
+  pi0D = 2*pi0/(1+pi0)
+  min_n = rbinom(sims ,n , pi0D)
+  data_frame(
+    n,
+    pi0,
+    decoy_n =rbinom(sims, min_n, .5),
+    target_n = n - decoy_n,
+    H0_n = min_n - decoy_n,
+    H1_n = target_n - H0_n)
+}
 
 sample_dataset = function(H1_n = 160,H0_n = 40, decoy_n = H0_n ,decoy_large_n = 2000,
                           H0_mean=2.75, H1_mean=3.31,H0_sd=.13,H1_sd=.28,
                           decoy_mean = H0_mean, decoy_sd = H0_sd,
                           decoy_large_mean = H0_mean, decoy_large_sd = H0_sd){
-  bind_rows(
-    data_frame(score = rnorm(decoy_large_n,decoy_large_mean,decoy_large_sd),
+  
+  d1 = d2 = d3 = d4 = NULL
+  if (decoy_large_n){
+   d1 = data_frame(score = rnorm(decoy_large_n,decoy_large_mean,decoy_large_sd),
                decoy = TRUE,
                H0 = FALSE,
                subset = FALSE)
-    ,
-    data_frame(score = rnorm(decoy_n,decoy_mean,decoy_sd),
+  } 
+  if (decoy_n){
+  d2 = data_frame(score = rnorm(decoy_n,decoy_mean,decoy_sd),
                decoy = TRUE,
                H0 = FALSE,
                subset = TRUE)
-    ,
-    data_frame(score = rnorm(H0_n,H0_mean,H0_sd),
+  } 
+  if (H0_n){
+  d3 = data_frame(score = rnorm(H0_n,H0_mean,H0_sd),
                decoy = FALSE,
                H0 = TRUE,
                subset = TRUE)
-    ,
-    data_frame(score = rnorm(H1_n,H1_mean,H1_sd),
+  } 
+  if (H1_n){
+  d4 =   data_frame(score = rnorm(H1_n,H1_mean,H1_sd),
                decoy = FALSE,
                H0 = FALSE,
                subset = TRUE)
-  )
-}
+  bind_rows(d1,d2,d3,d4)
+  }
+  }
 
 
 plot_theo_dist = function(H1_n = 160,H0_n = 40, decoy_n = H0_n ,decoy_large_n = 2000,

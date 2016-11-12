@@ -38,6 +38,9 @@ check_input = function(rawinput,sep = ','){
 }
 
 server = function(input, output, session) {
+  ## logic data input tab
+  #######################
+  
   ## read data from given path
   rawfiledata = reactive({readLines(req(input$file1$datapath))})
   # ## or read example data
@@ -57,16 +60,27 @@ server = function(input, output, session) {
   df = reactive({req(generate_errormessage() == 'Data format correct')
     read.csv(text = rawdata(),sep = ',')}) 
   
+  ## logic calculation tab
+  ########################
   df_calc = reactive({calculate_fdr(df(), score_higher = input$scorehigher)})
   
   output$contents <- renderDataTable({
-      mutate_at(req(df_calc()),
+    mutate_at(req(df_calc()),
               vars(score,pi_0,pi_0_cons, FDR, FDR_BH, FDR_stable),
               funs(round(.*1000)/1000))
   }, options = list(
     lengthMenu = c(10, 20, 100, 1000),
     pageLength = 20
-  ))
+  ))  
+  
+  output$downloadData <- downloadHandler(
+    filename = function() {
+      paste(input$file1$datapath, '_fdr.csv', sep = '')
+    },
+    content = function(file) {
+      write.csv(df_calc(), file)
+    })
+  
   ## logic diagnistic tab
   #######################
   output$plot1 = renderPlot({
@@ -75,47 +89,62 @@ server = function(input, output, session) {
 
   ## logic simulation tab
   #######################
-   output$plot_sim_diag = renderPlot({
-      input$simulate_action
-      d = isolate(sample_dataset(H1_n = input$H1_n,
-                         decoy_n = input$decoy_n,
-                         decoy_large_n = input$decoy_large_n,
-                         H0_n = input$H0_n,
-                         H0_mean = input$H0_mean,
-                         H1_mean = input$H1_mean,
-                         H0_sd = input$H0_sd,
-                         H1_sd = input$H1_sd,
-                         decoy_mean = input$decoy_mean,
-                         decoy_sd = input$decoy_sd,
-                         decoy_large_mean = input$decoy_large_mean,
-                         decoy_large_sd = input$decoy_large_sd))
-         plot_diag(d)$all
-      
-  }, width = 940,height = 410)
-   
-    output$plot_theo = renderPlot({
-      plot_theo_dist(H1_n = input$H1_n,
-                     decoy_n = input$decoy_n,
-                     decoy_large_n = input$decoy_large_n,
-                     H0_n = input$H0_n,
-                     H0_mean = input$H0_mean,
-                     H1_mean = input$H1_mean,
-                     H0_sd = input$H0_sd,
-                     H1_sd = input$H1_sd,
-                     decoy_mean = input$decoy_mean,
-                     decoy_sd = input$decoy_sd,
-                     decoy_large_mean = input$decoy_large_mean,
-                     decoy_large_sd = input$decoy_large_sd)$plot
-    }, width = 400, height = 400)  
-    
-  output$downloadData <- downloadHandler(
-    filename = function() {
-      paste(input$file1$datapath, '_fdr.csv', sep = '')
-    },
-    content = function(file) {
-      write.csv(df_calc(), file)
+  observeEvent((input$make_subset_action),{
+    par = simulate_subset(input$subset_n,input$subset_pi0)
+    updateTextInput(session,inputId = 'H1_n',value = par$H1_n)      
+    updateTextInput(session,inputId = 'H0_n',value = par$H0_n)
+    updateTextInput(session,inputId = 'decoy_n',value = par$decoy_n)
+  })
+  
+  ## check if decoy dist are the same and change value of respective boxes
+observe({
+    if(input$subsetdecoy){
+      updateTextInput(session,inputId = 'decoy_mean',value = input$H0_mean)      
+      updateTextInput(session,inputId = 'decoy_sd',value = input$H0_sd)
     }
-  )
+    if(input$largedecoy){
+      updateTextInput(session,inputId = 'decoy_large_mean',value = input$decoy_mean)      
+      updateTextInput(session,inputId = 'decoy_large_sd',value = input$decoy_sd)
+    }
+  })
+
+## check if there are enough PSMs for diagnostics
+#enough_targets_decoys = reactive({input$H1_n + input$H0_n) > 0) & (input$decoy_n > 0)})
+#output$not_enough_decoys_targets = reactive({ifelse(enough_targets_decoys,'',
+#                                                    'You need at least 1 decoy or target to visualize the diagnostic plots!')})
+
+output$plot_theo = renderPlot({
+  plot_theo_dist(H1_n = input$H1_n,
+                 decoy_n = input$decoy_n,
+                 decoy_large_n = input$decoy_large_n,
+                 H0_n = input$H0_n,
+                 H0_mean = input$H0_mean,
+                 H1_mean = input$H1_mean,
+                 H0_sd = input$H0_sd,
+                 H1_sd = input$H1_sd,
+                 decoy_mean = input$decoy_mean,
+                 decoy_sd = input$decoy_sd,
+                 decoy_large_mean = input$decoy_large_mean,
+                 decoy_large_sd = input$decoy_large_sd)$plot 
+}, width = 400, height = 400)  
+
+
+output$plot_sim_diag = renderPlot({
+  input$simulate_action
+  d = isolate(sample_dataset(H1_n = input$H1_n,
+                             decoy_n = input$decoy_n,
+                             decoy_large_n = input$decoy_large_n,
+                             H0_n = input$H0_n,
+                             H0_mean = input$H0_mean,
+                             H1_mean = input$H1_mean,
+                             H0_sd = input$H0_sd,
+                             H1_sd = input$H1_sd,
+                             decoy_mean = input$decoy_mean,
+                             decoy_sd = input$decoy_sd,
+                             decoy_large_mean = input$decoy_large_mean,
+                             decoy_large_sd = input$decoy_large_sd))
+  plot_diag(d)$all
+}, width = 940,height = 410)
 }
 
 ui = fluidPage(navbarPage(
@@ -235,8 +264,17 @@ the subset and complete set
 tabPanel('simulation',
          column(12,
                 HTML(markdownToHTML(text =  'explaination adn more bla bla bla bla bla bla'))
-                ,
-                fluidRow(column(6,"Correct target distribution",
+             , 'Generate',
+             tags$input(id = 'subset_n',type = "number", value = 200,min = 1,step = 10),
+             'subset PSMs with pi0 =',
+                tags$input(id = 'subset_pi0',type = "number", value = .1,step = .1,min = 0,max = 1),
+             actionButton("make_subset_action", label = "Go"),
+                         fluidRow(column(6,
+                                # fluidRow(column(2,'Generate'),
+                                #          column(3,numericInput('subset_n','', value = 100)),
+                                #          column(4,'subset PSMs with pi0 ='),
+                                #          column(3,numericInput('test', '',value = .1))),
+                                "Correct target distribution",
                                 fluidRow(column(4, numericInput('H1_n', 'number', 160)),
                                          column(4, numericInput('H1_mean', 'mean', 3.31,step = .1)),
                                          column(4, numericInput('H1_sd', 'sd', .28,step = .1)))
@@ -248,17 +286,19 @@ tabPanel('simulation',
                                 fluidRow(column(4, numericInput('decoy_n', 'number', 40)),
                                          column(4, numericInput('decoy_mean', 'mean', 2.75,step = .1)),
                                          column(4, numericInput('decoy_sd', 'sd', .13,step = .1)))
+                                ,checkboxInput('subsetdecoy','mean and sd of incorrect targets',value = TRUE)
                                 ,"Large decoy distribution",
                                 fluidRow(column(4, numericInput('decoy_large_n', 'number', 2000)),
                                          column(4, numericInput('decoy_large_mean', 'mean', 2.75,step = .1)),
-                                         column(4, numericInput('decoy_large_sd', 'sd', .13,step = .1))))
+                                         column(4, numericInput('decoy_large_sd', 'sd', .13,step = .1)))
+                                ,checkboxInput('largedecoy','mean and sd of subset decoys',value = TRUE))
                          ,
                          column(6,plotOutput('plot_theo'))
                 )
                 ,
                 actionButton("simulate_action", label = "Simulate"),
                 
-                fluidRow(column(12,'plot_sim_diag',plotOutput('plot_sim_diag')))
+                fluidRow(column(12,plotOutput('plot_sim_diag')))
          )
 )))
 
