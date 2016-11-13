@@ -19,8 +19,8 @@ calculate_fdr = function(df,score_higher = TRUE) {
     df,
     index = row_number(),
     ## pi_0 of subset PSMs
-    pi_0 = (sum(decoy[subset == 1] == 1)) /
-      (sum(decoy[subset == 1] != 1)),
+    # pi_0 = (sum(decoy[subset == 1] == 1)) /
+    #   (sum(decoy[subset == 1] != 1)),
     ## conservative pi_0 of subset PSMs with upperbound of 1
     pi_0_cons = (sum(decoy[subset == 1] == 1) + 1) /
       (sum(decoy[subset == 1] != 1) + 1),
@@ -103,7 +103,10 @@ PPplot = function(score, label, pi0 = 0,title = 'PP plot of target PSMs' ,
 
 
 plot_diag = function(df){
-  df = mutate(df,subset = subset == 1,decoy = decoy ==1)
+  df = mutate(df,subset = subset == 1,decoy = decoy ==1) %>%
+    ## remove non subset targets
+    filter(decoy|subset)
+
   dfsub = filter(df,subset)
   dfdec = filter(df,decoy)
 

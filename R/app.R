@@ -16,9 +16,8 @@
 # under the License.
 
 library(shiny)
-library(dplyr)
+library(tidyverse)
 library(markdown)
-library(ggplot2)
 
 check_input = function(rawinput,sep = ','){
   df = try({read.csv(text = rawinput,sep = sep)})
@@ -65,7 +64,7 @@ server = function(input, output, session) {
 
   output$contents <- renderDataTable({
     mutate_at(req(df_calc()),
-              vars(score,pi_0,pi_0_cons, FDR, FDR_BH, FDR_stable),
+              vars(score,pi_0_cons, FDR, FDR_BH, FDR_stable),
               funs(round(.*1000)/1000))
   }, options = list(
     lengthMenu = c(10, 20, 100, 1000),
@@ -215,14 +214,14 @@ Non subset targets (row 3) are ignored in the analysis.
   tabPanel('Calculate FDR',
            sidebarLayout(
              sidebarPanel(width = 12,
-                          HTML(markdownToHTML(text =
+                          withMathJax(),
+                           HTML(markdownToHTML(text =
 'The following columns were calculated:
-* **pi_0**: The estimated fraction of false positives in the subset.
-* **pi_0_cons**: A conservative estimation of pi_0.
+* **pi_0_cons**: A conservative estimation of pi_0. (pi_0_cons = (#decoys+1) / (#targets+1})
 * **FDR**: The estimated FDR at this score cutoff for subset PSMs.
 Missing for non-subset or decoy PSMs.
 * **FDR_stable**: The estimated stable FDR at this score cutoff for subset PSMs.
-This FDR is estimated from the complete decoy set and a conservative pi_0.
+This FDR is estimated from the complete decoy set and pi_0_cons.
 Missing for non-subset or decoy PSMs.
 Please check the diagnostics on the next tab.
 * **FDR_BH**: The estimated stable FDR at this score cutoff for subset PSMs.
