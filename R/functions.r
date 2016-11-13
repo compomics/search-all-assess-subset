@@ -1,3 +1,13 @@
+#' Title
+#'
+#' @param n_targets
+#' @param n_decoys
+#' @param pi0
+#'
+#' @return
+#' @export
+#'
+#' @examples
 pi0_likelihood = function(n_targets, n_decoys, pi0) {
   dbeta(pi0 / (1 + pi0), n_decoys + 1, n_targets + 1) *
     1 / (1 + pi0) ^ 2 /
