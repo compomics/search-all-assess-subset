@@ -5,9 +5,9 @@
 # to you under the Apache License, Version 2.0 (the
 # "License"); you may not use this file except in compliance
 # with the License.  You may obtain a copy of the License at
-# 
+#
 #   http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing,
 # software distributed under the License is distributed on an
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -19,12 +19,11 @@ library(shiny)
 library(dplyr)
 library(markdown)
 library(ggplot2)
-source('./functions.r')
 
 check_input = function(rawinput,sep = ','){
   df = try({read.csv(text = rawinput,sep = sep)})
   if (class(df) == 'try-error'){return('cannot read input')}
-  if(any(!(c('id','score','decoy','subset') %in% colnames(df)))) 
+  if(any(!(c('id','score','decoy','subset') %in% colnames(df))))
     {return('missing columns or wrong column names')}
   if(!is.numeric(df$score)) {return('Score should be numeric')}
   if(any(!(df$decoy ) %in% c(0,1))) {return('Decoy variable should be 0 or 1')}
@@ -40,30 +39,30 @@ check_input = function(rawinput,sep = ','){
 server = function(input, output, session) {
   ## logic data input tab
   #######################
-  
+
   ## read data from given path
   rawfiledata = reactive({readLines(req(input$file1$datapath))})
   # ## or read example data
   rawexamplefiledata = reactive({
     req(input$action)
     readLines('./cytoplasm.csv')})
-  
+
   observe({updateTextInput(session,inputId = 'rawinput',value = paste0(rawfiledata(),collapse = '\n'))})
-  observe({updateTextInput(session,inputId = 'rawinput',value = paste0(rawexamplefiledata(),collapse = '\n'))}) 
-  
+  observe({updateTextInput(session,inputId = 'rawinput',value = paste0(rawexamplefiledata(),collapse = '\n'))})
+
   rawdata = reactive({req(input$rawinput)})
-  
+
   generate_errormessage = reactive({check_input(rawdata())})
-  
+
   output$errormessage = reactive({generate_errormessage()})
-  
+
   df = reactive({req(generate_errormessage() == 'Data format correct')
-    read.csv(text = rawdata(),sep = ',')}) 
-  
+    read.csv(text = rawdata(),sep = ',')})
+
   ## logic calculation tab
   ########################
   df_calc = reactive({calculate_fdr(df(), score_higher = input$scorehigher)})
-  
+
   output$contents <- renderDataTable({
     mutate_at(req(df_calc()),
               vars(score,pi_0,pi_0_cons, FDR, FDR_BH, FDR_stable),
@@ -71,8 +70,8 @@ server = function(input, output, session) {
   }, options = list(
     lengthMenu = c(10, 20, 100, 1000),
     pageLength = 20
-  ))  
-  
+  ))
+
   output$downloadData <- downloadHandler(
     filename = function() {
       paste(input$file1$datapath, '_fdr.csv', sep = '')
@@ -80,7 +79,7 @@ server = function(input, output, session) {
     content = function(file) {
       write.csv(df_calc(), file)
     })
-  
+
   ## logic diagnistic tab
   #######################
   output$plot1 = renderPlot({
@@ -91,19 +90,19 @@ server = function(input, output, session) {
   #######################
   observeEvent((input$make_subset_action),{
     par = simulate_subset(input$subset_n,input$subset_pi0)
-    updateTextInput(session,inputId = 'H1_n',value = par$H1_n)      
+    updateTextInput(session,inputId = 'H1_n',value = par$H1_n)
     updateTextInput(session,inputId = 'H0_n',value = par$H0_n)
     updateTextInput(session,inputId = 'decoy_n',value = par$decoy_n)
   })
-  
+
   ## check if decoy dist are the same and change value of respective boxes
 observe({
     if(input$subsetdecoy){
-      updateTextInput(session,inputId = 'decoy_mean',value = input$H0_mean)      
+      updateTextInput(session,inputId = 'decoy_mean',value = input$H0_mean)
       updateTextInput(session,inputId = 'decoy_sd',value = input$H0_sd)
     }
     if(input$largedecoy){
-      updateTextInput(session,inputId = 'decoy_large_mean',value = input$decoy_mean)      
+      updateTextInput(session,inputId = 'decoy_large_mean',value = input$decoy_mean)
       updateTextInput(session,inputId = 'decoy_large_sd',value = input$decoy_sd)
     }
   })
@@ -125,8 +124,8 @@ output$plot_theo = renderPlot({
                  decoy_mean = input$decoy_mean,
                  decoy_sd = input$decoy_sd,
                  decoy_large_mean = input$decoy_large_mean,
-                 decoy_large_sd = input$decoy_large_sd)$plot 
-}, width = 400, height = 400)  
+                 decoy_large_sd = input$decoy_large_sd)$plot
+}, width = 400, height = 400)
 
 
 output$plot_sim_diag = renderPlot({
@@ -151,11 +150,11 @@ ui = fluidPage(navbarPage(
   "Search All, Assess Subset",
   tabPanel('Data input',
            sidebarLayout(
-             sidebarPanel(width = 7, 
-                          HTML(markdownToHTML(text = 
+             sidebarPanel(width = 7,
+                          HTML(markdownToHTML(text =
                                                 '
-This tool demonstrates the search-all-asses-subset method to control 
-the False Discovery Rate (FDR) when you are only interested in a subset 
+This tool demonstrates the search-all-asses-subset method to control
+the False Discovery Rate (FDR) when you are only interested in a subset
 of the identified PSMs from a shotgun proteomics experiment.
 
 The workflow is as follows:
@@ -164,7 +163,7 @@ The workflow is as follows:
 2. Removing irrelevant peptides
 3. Calculate FDR
 
-You can load the data from step **1.** into this webtool to perform 
+You can load the data from step **1.** into this webtool to perform
 step **2.** and **3.**'
                           )), hr(),
                           fileInput ('file1',
@@ -174,15 +173,15 @@ step **2.** and **3.**'
                                                 '.csv')
                           ),
                           checkboxInput("scorehigher", "Are higher scores better?", TRUE),
-                          HTML(markdownToHTML(text = 
+                          HTML(markdownToHTML(text =
                                                 '
-Use the **Choose File** button above to load a CSV file from your computer 
+Use the **Choose File** button above to load a CSV file from your computer
 or paste the data in the **text area** to the right.
 
 Adhere to the following format:
 * Every Row is a unique PSM
 * Every row contains:
- + **id**: Can be any text or number 
+ + **id**: Can be any text or number
  + **score**: Score given to the PSM, higher scores are better
  + **decoy**: 0 or 1; 1 indicates that the PSM matches a decoy peptide sequence
  + **subset**:  0 or 1: 1 indicates that the PSM matches a subset peptide sequence
@@ -203,20 +202,20 @@ Additional decoy PSMs (row 1) are used for a more stable FDR calculation.
 Non subset targets (row 3) are ignored in the analysis.
 
 **Load an example dataset:**
-')),      
+')),
                           actionButton("action", label = "Load example")
              ),
              mainPanel(width = 5,h3(textOutput('errormessage',container = span)),
                        tags$textarea(id = 'rawinput',label = '',
                                      rows = '20',cols = 40))
            )),
-  
-  
-  
+
+
+
   tabPanel('Calculate FDR',
            sidebarLayout(
              sidebarPanel(width = 12,
-                          HTML(markdownToHTML(text = 
+                          HTML(markdownToHTML(text =
 'The following columns were calculated:
 * **pi_0**: The estimated fraction of false positives in the subset.
 * **pi_0_cons**: A conservative estimation of pi_0.
@@ -233,8 +232,8 @@ Missing for non-subset or decoy PSMs.
 
 Download the results to your computer:
 ')),
-                          downloadButton('downloadData', 'Download')),      
-             
+                          downloadButton('downloadData', 'Download')),
+
              mainPanel(width = 12,dataTableOutput('contents'))
            )),
   tabPanel('Check diagnostic plots',
@@ -263,7 +262,7 @@ The PP-plot in panel **c**  shows the subset decoy PSMs plotted against all deco
 The whole plot should follow the identity line, indicating that the complete set of decoys is a good representation of the subset decoys.
 To verify that the subset decoys (and thus also the complete set of decoys) are representative for the mixture component for incorrect PSMs of the target mixture distribution, we look at the PP-plot of the subset decoys against the subset targets in panel **d**.
 The profile should look as described for panel **b**.
-If the profile matches in panel **d** but does not for panel **b**, then we suggest to not use the extra decoy set and use only the subset decoys for FDR estimation. 
+If the profile matches in panel **d** but does not for panel **b**, then we suggest to not use the extra decoy set and use only the subset decoys for FDR estimation.
 
 When you are not sure how the diagnostic plots should look like, you can simulate your own data under various (erratic) settings in the simulation tab.
 '))
@@ -277,7 +276,7 @@ tabPanel('simulation',
                         HTML(markdownToHTML(text =  '
 Here you can simulate your own data and look at examples of diagnostic plots.
 See the Check diagnostic plots tab to read a full description on how to interpret these plots.
-Change the mean and sd parameters of the subset/large decoy set to different values then the incorrect target distribution 
+Change the mean and sd parameters of the subset/large decoy set to different values then the incorrect target distribution
 to generate examples of diagnostic plots that illustrate cases were the assumptions on the decoy set are not met.
 The density plot on the left shows the theoretical distribution of each component of the PSM mixture distribution given the specified parameters.
 Each time you press the Simulate button, a random dataset is sampled from this distribution and new diagnostic plots are displayed.
@@ -316,7 +315,7 @@ Each time you press the Simulate button, a random dataset is sampled from this d
                 )
                 ,
                 actionButton("simulate_action", label = "Simulate"),
-                
+
                 fluidRow(column(12,plotOutput('plot_sim_diag')))
          )
 )))))
