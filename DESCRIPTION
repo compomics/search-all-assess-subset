@@ -1,5 +1,5 @@
 Package: saas
-Title: An implementation of the Search All, Asses Subset strategy for shotgun proteomics.
+Title: An implementation of the Search All, Asses Subset strategy for FDR estimation shotgun proteomics.
 Version: 0.0.0.9000
 Authors@R: person("Adriaan", "Sticker", email = "adriaan.sticker@ugent.be", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
