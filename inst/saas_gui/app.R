@@ -319,4 +319,4 @@ Each time you press the Simulate button, a random dataset is sampled from this d
          )
 )))))
 
-
+shinyApp(ui = ui, server = server)#,options = list(port = 3320, host  = "0.0.0.0"))

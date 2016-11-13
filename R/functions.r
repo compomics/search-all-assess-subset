@@ -303,3 +303,22 @@ plot_theo_dist = function(H1_n = 160,H0_n = 40, decoy_n = H0_n ,decoy_large_n = 
   list(data = d,plot = p1)
   }
 
+
+#' Launches the GUI version of saas.
+#'
+#' To easily launch the GUI outside an R session (eg. on a server),
+#' you can run R -e "library(saas);saas_gui()" from the terminal (on linux/mac).
+#'
+#' see ?shiny::runApp for help all parameters.
+#'
+#' @param port
+#' @param host
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+saas_gui = function(port = 3320, host  = "0.0.0.0",...){
+  shiny::runApp(system.file('saas_gui', package='saas'),port = port, host  = host, ...)
+}
