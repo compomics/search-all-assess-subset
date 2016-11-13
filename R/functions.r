@@ -1,17 +1,20 @@
-library(tidyverse)
 pi0_likelihood = function(n_targets, n_decoys, pi0) {
   dbeta(pi0 / (1 + pi0), n_decoys + 1, n_targets + 1) *
     1 / (1 + pi0) ^ 2 /
     pbeta(.5, n_decoys + 1, n_targets + 1)
 }
 
-#' Title
+#' Calculate qvalues of the subset PSMs.
 #'
-#' @param df
-#' @param score_higher
+#' @param df A dataframe containing scores from decoy and subset target PSMs (see details)
+#' @param score_higher TRUE if higher scores mean a better peptide sequence match.
 #'
-#' @return
+#' @return A data frame containing the collumns from the original input,
+#' A collumn with the conservative pi_0 estimation,
+#' the estimated qvalues from the stable FDR estimation strategy unsing the conservative pi_0 estimator and a large decoy set.
+#' Lastly, a collumn containing qvalues estimated with the Benjamini Hochbergh procedure.
 #' @export
+#' @import dplyr
 #'
 #' @examples
 calculate_fdr = function(df,score_higher = TRUE) {
@@ -54,7 +57,7 @@ calculate_fdr = function(df,score_higher = TRUE) {
 #'
 #' @return
 #' @export
-#'
+#' @import ggplot2
 #' @examples
 pi0plot = function(n_targets, n_decoys) {
   grid = seq(0, 1, .001)
@@ -77,6 +80,20 @@ pi0plot = function(n_targets, n_decoys) {
     )
 }
 
+#' Title
+#'
+#' @param score
+#' @param label
+#' @param pi0
+#' @param title
+#' @param xlab
+#' @param ylab
+#'
+#' @return
+#' @export
+#' @import ggplot2
+#' @import tibble
+#' @examples
 PPplot = function(score, label, pi0 = 0,title = 'PP plot of target PSMs' ,
                   xlab = 'Decoy percentile' ,ylab = 'Target\npercentile'){
   p = ggplot()  +
@@ -102,6 +119,16 @@ PPplot = function(score, label, pi0 = 0,title = 'PP plot of target PSMs' ,
 }
 
 
+#' Title
+#'
+#' @param df
+#'
+#' @return
+#' @export
+#' @import ggplot2
+#' @import dplyr
+#' @import cowplot
+#' @examples
 plot_diag = function(df){
   df = mutate(df,subset = subset == 1,decoy = decoy ==1) %>%
     ## remove non subset targets
@@ -132,6 +159,16 @@ plot_diag = function(df){
               decoyall_decoy_subset = p3, decoysubset_target_subset = p4, all = p_all))
 }
 
+#' Title
+#'
+#' @param n
+#' @param pi0
+#' @param sims
+#'
+#' @return
+#' @export
+#' @import tibble
+#' @examples
 simulate_subset = function(n,pi0,sims = 1){
   pi0D = 2*pi0/(1+pi0)
   min_n = rbinom(sims ,n , pi0D)
@@ -144,6 +181,26 @@ simulate_subset = function(n,pi0,sims = 1){
     H1_n = target_n - H0_n)
 }
 
+#' Title
+#'
+#' @param H1_n
+#' @param H0_n
+#' @param decoy_n
+#' @param decoy_large_n
+#' @param H0_mean
+#' @param H1_mean
+#' @param H0_sd
+#' @param H1_sd
+#' @param decoy_mean
+#' @param decoy_sd
+#' @param decoy_large_mean
+#' @param decoy_large_sd
+#'
+#' @return
+#' @export
+#' @import dplyr
+#'
+#' @examples
 sample_dataset = function(H1_n = 160,H0_n = 40, decoy_n = H0_n ,decoy_large_n = 2000,
                           H0_mean=2.75, H1_mean=3.31,H0_sd=.13,H1_sd=.28,
                           decoy_mean = H0_mean, decoy_sd = H0_sd,
@@ -178,6 +235,26 @@ sample_dataset = function(H1_n = 160,H0_n = 40, decoy_n = H0_n ,decoy_large_n = 
   }
 
 
+#' Title
+#'
+#' @param H1_n
+#' @param H0_n
+#' @param decoy_n
+#' @param decoy_large_n
+#' @param H0_mean
+#' @param H1_mean
+#' @param H0_sd
+#' @param H1_sd
+#' @param decoy_mean
+#' @param decoy_sd
+#' @param decoy_large_mean
+#' @param decoy_large_sd
+#'
+#' @return
+#' @export
+#' @import dplyr
+#' @import ggplot2
+#' @examples
 plot_theo_dist = function(H1_n = 160,H0_n = 40, decoy_n = H0_n ,decoy_large_n = 2000,
                                  H0_mean=2.75, H1_mean=3.31,H0_sd=.13,H1_sd=.28,
                           decoy_mean = H0_mean, decoy_sd = H0_sd,
