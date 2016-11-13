@@ -44,7 +44,7 @@ server = function(input, output, session) {
   # ## or read example data
   rawexamplefiledata = reactive({
     req(input$action)
-    readLines('./cytoplasm.csv')})
+    readLines(system.file("extdata", "cytoplasm.csv", package = "saas"))})
 
   observe({updateTextInput(session,inputId = 'rawinput',value = paste0(rawfiledata(),collapse = '\n'))})
   observe({updateTextInput(session,inputId = 'rawinput',value = paste0(rawexamplefiledata(),collapse = '\n'))})
