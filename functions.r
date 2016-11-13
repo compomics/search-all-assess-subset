@@ -194,10 +194,10 @@ plot_theo_dist = function(H1_n = 160,H0_n = 40, decoy_n = H0_n ,decoy_large_n = 
 
  d = bind_rows(
     mutate(d,dens = p_decoy_large * dnorm(score,decoy_large_mean,decoy_large_sd),
-               dist = 'decoy_large')
+               dist = 'extra_decoys')
     ,
     mutate(d,dens = p_decoy * dnorm(score,decoy_mean,decoy_sd),
-           dist = 'decoy')
+           dist = 'subset_decoys')
     ,
     mutate(d,dens = p_H0 * dnorm(score,H0_mean,H0_sd),
            dist = 'H0')
@@ -207,28 +207,22 @@ plot_theo_dist = function(H1_n = 160,H0_n = 40, decoy_n = H0_n ,decoy_large_n = 
     ,
     mutate(d,dens = p_decoy * dnorm(score,decoy_mean,decoy_sd) + 
              p_decoy_large * dnorm(score,decoy_large_mean,decoy_large_sd),
-           dist = 'decoy_all')
+           dist = 'all_decoys')
     ,
     mutate(d,dens = p_H0 * dnorm(score,H0_mean,H0_sd) + 
              p_H1 * dnorm(score,H1_mean,H1_sd),
-           dist = 'target')
+           dist = 'targets')
   )
-  
-  p1 = ggplot(d,aes(score,dens,col = dist)) + geom_line() +
-    labs(x = 'Score',y = 'Density',colour= '') +
+
+ d = mutate(d,dist = factor(dist,levels = unique(d$dist))) 
+  p1 = ggplot(d,aes(score,dens,col = dist,size = dist,linetype = dist)) + geom_line() +
+    labs(x = 'Score',y = 'Density', colour = '',linetype = '',size = '') +
     theme(axis.title = element_text(size = rel(1.2)), axis.title.y = element_text(angle = 0),
-          legend.position = 'top')
+          legend.position = 'top') +
+    scale_size_manual(values=c(1,1,1,1,2,2))+  
+    scale_linetype_manual(values=c(2,3,2,3,1,1)) +
+    scale_color_manual(values = c('red','red','blue','blue','red','blue'))
   print(p1)
   list(data = d,plot = p1)
   }
-
-
-# d = read.csv('/home/adriaan/Dropbox/paper_subset/revision/Rpackage/cytoplasm.csv',sep = ',')
-# write.csv(d,'/home/adriaan/Dropbox/paper_subset/revision/Rpackage/cytoplasm_back.csv',row.names = FALSE)
-# nrow(d)
-# d2 = filter(d, !(!decoy & !subset))
-# write.csv(d2,'/home/adriaan/Dropbox/paper_subset/revision/Rpackage/cytoplasm.csv',row.names = FALSE)
-# d = read_delim('/home/adriaan/Dropbox/paper_subset/revision/Rpackage/cytoplasm.csv',delim = ',')
-# head(d)
-# 
 

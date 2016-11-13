@@ -198,6 +198,9 @@ id,score,decoy,subset
 4,73.83,0,1
 </pre>
 **Warning:** use this tool only with PSMs from a competitive target-decoy search!
+The minimal required input are PSMs from subset targets and decoys (row 2 and 4 in example input).
+Additional decoy PSMs (row 1) are used for a more stable FDR calculation.
+Non subset targets (row 3) are ignored in the analysis.
 
 **Load an example dataset:**
 ')),      
@@ -234,37 +237,53 @@ Download the results to your computer:
              
              mainPanel(width = 12,dataTableOutput('contents'))
            )),
-  tabPanel('Check diagnostics plots',
+  tabPanel('Check diagnostic plots',
            sidebarLayout(
              sidebarPanel(width = 12,
                           HTML(markdownToHTML(text =  '
-**TODO: explain diagnostics according paper**
-The reweighted subset FDR relies on the assumption that the properties of 
-the PSMs in the subset and the complete set are similar.
-You can use use the histograms of the scores below to visually check this 
-assumption.
-Grey is the distribution of the target scores.
-Blue is the distribution of the decoy scores. This is the estimated distribution
-of incorrect PSMs.
-Red is the estimated distribution of the correct PSMs.
+These are diagnostic plots to evaluate the quality of the decoy set and the estimation of the fraction of incorrect target PSMs (pi0).
+This allows an informed choice on the use of the stable all-sub FDR estimator and the large decoy set.
 
-* The location of the decoy distribution should be similar in the subset and 
-complete set
-* The location of the estimated correct PSM distribution should be similar 
-in the subset and complete set
-* The shape of the decoy distribution should be similar in the subset and 
-complete set
-* The shape of the estimated correct PSM distribution should be similar in 
-the subset and complete set
+**Panel a** shows the posterior distribution of pi_0 given the observed number of target and decoy PSMs in the subset.
+The vertical line indicates our conservative estimation of pi_0 used in the calculations.
+At very high pi_0 uncertainty (broad peak), you can opt to use the BH procedure to minimize sample to sample variability.
+However, this will come at the expense of too conservative PSM lists.
+
+Our improved TDA for subsets relies on the assumption that incorrect subset PSMs and the complete set of decoys are following the same distribution.
+This distributional assumption can be verified through a PP-plot where the empirical Cumulative Distribution Function (eCDF) of the decoys is plotted against the eCDF of the subset target PSMs.
+The PP-plots in **panel b - d** display the target subset PSMs plotted against all decoy PSMs from the complete search, the decoy subset PSMs plotted against all decoy PSMs from the complete search, and the target subset PSMs plotted against the decoy PSMs from the complete search, respectively.
+The full line in panel **b** and **d** indicates a line with a slope of pi_0.
+The full line in panel **c** indicates the identity line.
+The first part of the plot in **a** and **b** is linear with a slope that equals pi_0.
+This indicates that the decoy distribution and the mixture component for incorrect PSMs of the target mixture distribution coincide.
+The second part of the plot deviates from the line towards higher percentiles and will ultimately become vertical (decoy percentile = 1).
+If we see this profile in panel **a**, we have a good indication that the set of decoys from the complete search is representative for the mixture component for incorrect PSMs of the target mixture distribution.
+Deviations from this pattern might be subtle, therefore we provide the PP plots in **c** and **d** to support the conclusion drawn from panel **b**.
+The PP-plot in panel **c**  shows the subset decoy PSMs plotted against all decoy PSMs.
+The whole plot should follow the identity line, indicating that the complete set of decoys is a good representation of the subset decoys.
+To verify that the subset decoys (and thus also the complete set of decoys) are representative for the mixture component for incorrect PSMs of the target mixture distribution, we look at the PP-plot of the subset decoys against the subset targets in panel **d**.
+The profile should look as described for panel **b**.
+If the profile matches in panel **d** but does not for panel **b**, then we suggest to not use the extra decoy set and use only the subset decoys for FDR estimation. 
+
+When you are not sure how the diagnostic plots should look like, you can simulate your own data under various (erratic) settings in the simulation tab.
 '))
              ),
               mainPanel(width = 12,plotOutput('plot1'))
            ))
 ,
 tabPanel('simulation',
-         column(12,
-                HTML(markdownToHTML(text =  'explaination adn more bla bla bla bla bla bla'))
-             , 'Generate',
+         sidebarLayout(
+           sidebarPanel(width = 12,
+                        HTML(markdownToHTML(text =  '
+Here you can simulate your own data and look at examples of diagnostic plots.
+See the Check diagnostic plots tab to read a full description on how to interpret these plots.
+Change the mean and sd parameters of the subset/large decoy set to different values then the incorrect target distribution 
+to generate examples of diagnostic plots that illustrate cases were the assumptions on the decoy set are not met.
+The density plot on the left shows the theoretical distribution of each component of the PSM mixture distribution given the specified parameters.
+Each time you press the Simulate button, a random dataset is sampled from this distribution and new diagnostic plots are displayed.
+'))),
+         mainPanel(width = 12,column(12,
+            'Generate',
              tags$input(id = 'subset_n',type = "number", value = 200,min = 1,step = 10),
              'subset PSMs with pi0 =',
                 tags$input(id = 'subset_pi0',type = "number", value = .1,step = .1,min = 0,max = 1),
@@ -300,7 +319,7 @@ tabPanel('simulation',
                 
                 fluidRow(column(12,plotOutput('plot_sim_diag')))
          )
-)))
+)))))
 
 
 shinyApp(ui = ui, server = server,options = list(port = 3320, host  = "0.0.0.0"))
