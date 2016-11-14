@@ -16,13 +16,13 @@ pi0_likelihood = function(n_targets, n_decoys, pi0) {
 
 #' Calculate qvalues of the subset PSMs.
 #'
-#' @param df A dataframe containing scores from decoy and subset target PSMs (see details)
+#' @param df A dataframe with at least the columns scores from decoy and subset target PSMs (see details)
 #' @param score_higher TRUE if higher scores mean a better peptide sequence match.
 #'
 #' @return A data frame containing the collumns from the original input,
-#' A collumn with the conservative pi_0 estimation,
-#' the estimated qvalues from the stable FDR estimation strategy unsing the conservative pi_0 estimator and a large decoy set.
-#' Lastly, a collumn containing qvalues estimated with the Benjamini Hochbergh procedure.
+#' A column with the conservative pi_0 estimation,
+#' the estimated qvalues from the stable FDR estimation strategy using the conservative pi_0 estimator and a large decoy set.
+#' Lastly, a column containing qvalues estimated with the Benjamini Hochbergh procedure.
 #' @export
 #' @import dplyr
 #'
