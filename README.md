@@ -16,7 +16,7 @@ Then install saas using the `install_github` function in the
 
 ```r
 library(devtools)
-install_github("lievenclement/flowFDAExampleData")
+install_github("compomics/search-all-assess-subset")
 ```
 
 ## Runing the saas GUI
