@@ -24,7 +24,7 @@ install_github("compomics/search-all-assess-subset")
 When saas is installed, you can easily launch the GUI from r.
 ```r
 library(saas)
-install_github("lievenclement/flowFDAExampleData")
+saas_gui()
 ```
 Or if you want to run saas from the terminal.
 
