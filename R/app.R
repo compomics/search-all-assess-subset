@@ -169,7 +169,7 @@ output$plot_theo = renderPlot({
 ##' .. content for \details{} ..
 ##' @return
 ##' @author
-ui = function() fluidPage(navbarPage(selected = 'simulation',
+ui = function() fluidPage(navbarPage(
   "Search All, Assess Subset",
   tabPanel('Data input',
            sidebarLayout(
@@ -336,12 +336,12 @@ mainPanel(width = 12,
                  column(6, 'incorrect targets',
                         wellPanel(
                           fluidRow(column(6, numericInput('H0_mean', 'mean', 2.75,step = .1)),
-                                   column(6, numericInput('H0_sd', 'sd', .13,step = .1)))))
+                                   column(6, numericInput('H0_sd', 'sd', 0.13,step = .1)))))
                 ,
                  column(6, 'correct targets',
                         wellPanel(
                           fluidRow(column(6, numericInput('H1_mean', 'mean', 3.31,step = .1)),
-                                   column(6, numericInput('H1_sd', 'sd', .28,step = .1))))))
+                                   column(6, numericInput('H1_sd', 'sd', 0.28,step = .1))))))
          ,
           column(6,
                  HTML(markdownToHTML(text ='__Subset decoys distribution__')),
