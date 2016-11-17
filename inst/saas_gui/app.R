@@ -15,10 +15,17 @@
 # specific language governing permissions and limitations
 # under the License.
 
-library(shiny)
-library(tidyverse)
+## library(shiny)
+## library(tidyverse)
 library(markdown)
-
+##' .. content for \description{} (no empty lines) ..
+##'
+##' .. content for \details{} ..
+##' @title
+##' @param rawinput
+##' @param sep
+##' @return
+##' @author
 check_input = function(rawinput,sep = ','){
   df = try({read.csv(text = rawinput,sep = sep)})
   if (class(df) == 'try-error'){return('cannot read input')}
@@ -34,11 +41,19 @@ check_input = function(rawinput,sep = ','){
 ##  return(df)
   return('Data format correct')
 }
-
+##' .. content for \description{} (no empty lines) ..
+##'
+##' .. content for \details{} ..
+##' @title
+##' @param input
+##' @param output
+##' @param session
+##' @return
+##' @author
 server = function(input, output, session) {
+  observe({cat(input$tabs, '\n')})
   ## logic data input tab
   #######################
-
   ## read data from given path
   rawfiledata = reactive({readLines(req(input$file1$datapath))})
   # ## or read example data
@@ -95,16 +110,16 @@ server = function(input, output, session) {
   })
 
   ## check if decoy dist are the same and change value of respective boxes
-observe({
-    if(input$subsetdecoy){
-      updateTextInput(session,inputId = 'decoy_mean',value = input$H0_mean)
-      updateTextInput(session,inputId = 'decoy_sd',value = input$H0_sd)
-    }
-    if(input$largedecoy){
-      updateTextInput(session,inputId = 'decoy_large_mean',value = input$decoy_mean)
-      updateTextInput(session,inputId = 'decoy_large_sd',value = input$decoy_sd)
-    }
-  })
+## observe({
+##     if(input$subsetdecoy){
+##       updateTextInput(session,inputId = 'decoy_mean',value = input$H0_mean)
+##       updateTextInput(session,inputId = 'decoy_sd',value = input$H0_sd)
+##     }
+##     if(input$extradecoy){
+##       updateTextInput(session,inputId = 'decoy_large_mean',value = input$decoy_mean)
+##       updateTextInput(session,inputId = 'decoy_large_sd',value = input$decoy_sd)
+##     }
+##   })
 
 ## check if there are enough PSMs for diagnostics
 #enough_targets_decoys = reactive({input$H1_n + input$H0_n) > 0) & (input$decoy_n > 0)})
@@ -144,8 +159,13 @@ output$plot_sim_diag = renderPlot({
   plot_diag(d)$all
 }, width = 940,height = 410)
 }
-
-ui = fluidPage(navbarPage(
+##' UI shiny app
+##'
+##' .. content for \details{} ..
+##' @return
+##' @author
+##' @import markdown
+ui = function() fluidPage(navbarPage(selected = 'simulation',
   "Search All, Assess Subset",
   tabPanel('Data input',
            sidebarLayout(
@@ -269,6 +289,56 @@ When you are not sure how the diagnostic plots should look like, you can simulat
               mainPanel(width = 12,plotOutput('plot1'))
            ))
 ,
+## tabPanel('simulation',
+##          sidebarLayout(
+##            sidebarPanel(width = 12,
+##                         HTML(markdownToHTML(text =  '
+## Here you can simulate your own data and look at examples of diagnostic plots.
+## See the Check diagnostic plots tab to read a full description on how to interpret these plots.
+## Change the mean and sd parameters of the subset/large decoy set to different values then the incorrect target distribution
+## to generate examples of diagnostic plots that illustrate cases were the assumptions on the decoy set are not met.
+## The density plot on the left shows the theoretical distribution of each component of the PSM mixture distribution given the specified parameters.
+## Each time you press the Simulate button, a random dataset is sampled from this distribution and new diagnostic plots are displayed.
+## '))),
+##          mainPanel(width = 12,column(12,
+##             'Generate',
+##              tags$input(id = 'subset_n',type = "number", value = 200,min = 1,step = 10),
+##              'subset PSMs with pi0 =',
+##                 tags$input(id = 'subset_pi0',type = "number", value = .1,step = .1,min = 0,max = 1),
+##              actionButton("make_subset_action", label = "Go"),
+##                          fluidRow(column(6,
+##                                 # fluidRow(column(2,'Generate'),
+##                                 #          column(3,numericInput('subset_n','', value = 100)),
+##                                 #          column(4,'subset PSMs with pi0 ='),
+##                                 #          column(3,numericInput('test', '',value = .1))),
+##                                 "Correct target distribution",
+##                                 fluidRow(column(4, numericInput('H1_n', 'number', 160)),
+##                                          column(4, numericInput('H1_mean', 'mean', 3.31,step = .1)),
+##                                          column(4, numericInput('H1_sd', 'sd', .28,step = .1)))
+##                                 ,"Incorrect target distribution",
+##                                 fluidRow(column(4, numericInput('H0_n', 'number', 40)),
+##                                          column(4, numericInput('H0_mean', 'mean', 2.75,step = .1)),
+##                                          column(4, numericInput('H0_sd', 'sd', .13,step = .1)))
+##                                 ,"Subset decoy distribution",
+##                                 fluidRow(column(4, numericInput('decoy_n', 'number', 40)),
+##                                          column(4, numericInput('decoy_mean', 'mean', 2.75,step = .1)),
+##                                          column(4, numericInput('decoy_sd', 'sd', .13,step = .1)))
+##                                 ,checkboxInput('subsetdecoy','mean and sd of incorrect targets',value = TRUE)
+##                                 ,"Large decoy distribution",
+##                                 fluidRow(column(4, numericInput('decoy_large_n', 'number', 2000)),
+##                                          column(4, numericInput('decoy_large_mean', 'mean', 2.75,step = .1)),
+##                                          column(4, numericInput('decoy_large_sd', 'sd', .13,step = .1)))
+##                                 ,checkboxInput('largedecoy','mean and sd of subset decoys',value = TRUE))
+##                          ,
+##                          column(6,plotOutput('plot_theo'))
+##                 )
+##                 ,
+##                 actionButton("simulate_action", label = "Simulate"),
+
+##                 fluidRow(column(12,plotOutput('plot_sim_diag')))
+##          )
+##          )))
+## ## ,
 tabPanel('simulation',
          sidebarLayout(
            sidebarPanel(width = 12,
@@ -280,43 +350,99 @@ to generate examples of diagnostic plots that illustrate cases were the assumpti
 The density plot on the left shows the theoretical distribution of each component of the PSM mixture distribution given the specified parameters.
 Each time you press the Simulate button, a random dataset is sampled from this distribution and new diagnostic plots are displayed.
 '))),
-         mainPanel(width = 12,column(12,
-            'Generate',
-             tags$input(id = 'subset_n',type = "number", value = 200,min = 1,step = 10),
-             'subset PSMs with pi0 =',
-                tags$input(id = 'subset_pi0',type = "number", value = .1,step = .1,min = 0,max = 1),
-             actionButton("make_subset_action", label = "Go"),
-                         fluidRow(column(6,
-                                # fluidRow(column(2,'Generate'),
-                                #          column(3,numericInput('subset_n','', value = 100)),
-                                #          column(4,'subset PSMs with pi0 ='),
-                                #          column(3,numericInput('test', '',value = .1))),
-                                "Correct target distribution",
-                                fluidRow(column(4, numericInput('H1_n', 'number', 160)),
-                                         column(4, numericInput('H1_mean', 'mean', 3.31,step = .1)),
-                                         column(4, numericInput('H1_sd', 'sd', .28,step = .1)))
-                                ,"Incorrect target distribution",
-                                fluidRow(column(4, numericInput('H0_n', 'number', 40)),
-                                         column(4, numericInput('H0_mean', 'mean', 2.75,step = .1)),
-                                         column(4, numericInput('H0_sd', 'sd', .13,step = .1)))
-                                ,"Subset decoy distribution",
-                                fluidRow(column(4, numericInput('decoy_n', 'number', 40)),
-                                         column(4, numericInput('decoy_mean', 'mean', 2.75,step = .1)),
-                                         column(4, numericInput('decoy_sd', 'sd', .13,step = .1)))
-                                ,checkboxInput('subsetdecoy','mean and sd of incorrect targets',value = TRUE)
-                                ,"Large decoy distribution",
-                                fluidRow(column(4, numericInput('decoy_large_n', 'number', 2000)),
-                                         column(4, numericInput('decoy_large_mean', 'mean', 2.75,step = .1)),
-                                         column(4, numericInput('decoy_large_sd', 'sd', .13,step = .1)))
-                                ,checkboxInput('largedecoy','mean and sd of subset decoys',value = TRUE))
-                         ,
-                         column(6,plotOutput('plot_theo'))
-                )
+mainPanel(width = 12,
+          column(8,
+                 fluidRow(column(4, '# subset targets'),
+                          column(4, tags$input(id = '#subset targets',type = "number",
+                                               value = 200,min = 1,step = 10))
+                          ## column(4, numericInput('H1_n', '', 160)),
+                          ),
+                 fluidRow(column(4, '# subset decoys'),
+                          column(4, tags$input(id = '#subset targets',type = "number",
+                                               value = 200,min = 1,step = 10))),
+                 fluidRow(column(4, '# extra decoys'),
+                          ## column(4, numericInput('H1_n', 'number', 160)))
+                          column(4, tags$input(id = '#subset targets',type = "number",
+                                               value = 200,min = 1,step = 10))))
+         ,
+          column(4, fluidRow(actionButton("action_simulate", label = "GO")),
+                 fluidRow(checkboxInput("check_also_decoys", label = "Simulate also decoys")))
+         , br(),
+          column(12,br(),
+                 column(12,
+                        HTML(markdownToHTML(text ='__Subset target mixture distribution__')))
                 ,
-                actionButton("simulate_action", label = "Simulate"),
+                 column(6, 'incorrect targets',
+                        wellPanel(
+                          fluidRow(column(6, numericInput('H0_mean', 'mean', 200)),
+                                   column(6, numericInput('H0_sd', 'sd', 200)))))
+                ,
+                 column(6, 'correct targets',
+                        wellPanel(
+                          fluidRow(column(6, numericInput('H1_mean', 'mean', 200)),
+                                   column(6, numericInput('H1_sd', 'sd', 200))))))
+         ,
+          column(6,
+                 column(12,
+                        HTML(markdownToHTML(text ='__Subset decoys distribution__'))),
+                 checkboxInput('check_subset_decoys_same','Same as incorrect target PSMs?',value = TRUE)
+                ,
+                 column(12,
+                        conditionalPanel(
+                          condition = "input.check_subset_decoys_same == false",
+                          wellPanel(
+                            fluidRow(column(6, numericInput('H0_mean', 'mean', 200)),
+                                     column(6, numericInput('H0_sd', 'sd', 200))))
+                        ))
+                ,
+                 HTML(markdownToHTML(text ='__Extra decoys distribution__')),
+                 checkboxInput('check_extra_decoys_same','Same as subset decoy PSMs?',value = TRUE)
+                ,
+                 column(12,
+                        conditionalPanel(condition = "input.check_extra_decoys_same == false",
+                                         wellPanel(
+                                           fluidRow(column(6, numericInput('H0_mean', 'mean', 200)),
+                                                    column(6, numericInput('H0_sd', 'sd', 200))))
+                                         )
+                        )
+                 ## ,
+                 ##        column(5,plotOutput('plot_theo'))
+                 )
+          ## ,
+          ##                    fluidRow(column(12,plotOutput('plot_sim_diag')))
+          )
+))
 
-                fluidRow(column(12,plotOutput('plot_sim_diag')))
-         )
-)))))
+))
 
-shinyApp(ui = ui, server = server)#,options = list(port = 3320, host  = "0.0.0.0"))
+## shinyApp(ui = ui(), server = server)#,options = list(port = 3320, host  = "0.0.0.0"))
+##' .. content for \description{} (no empty lines) ..
+##'
+##' .. content for \details{} ..
+##' @title
+##' @return
+##' @author
+##' @export
+appfun = function(){
+  shinyApp(ui = ui, server = server)
+}
+
+
+numericInput2 = function (inputId, label, value, min = NA, max = NA, step = NA,
+    width = '70px')
+{
+    value <- restoreInput(id = inputId, default = value)
+    inputTag <- tags$input(id = inputId, type = "number", class = "form-control",
+        value = value)
+    if (!is.na(min))
+        inputTag$attribs$min = min
+    if (!is.na(max))
+        inputTag$attribs$max = max
+    if (!is.na(step))
+        inputTag$attribs$step = step
+    div(style = if (!is.null(width))
+        paste0("width: ", validateCssUnit(width), ";"), label
+        , inputTag)
+}
+
+ shinyApp(ui = ui(), server = server)

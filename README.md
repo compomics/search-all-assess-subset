@@ -19,7 +19,7 @@ library(devtools)
 install_github("compomics/search-all-assess-subset")
 ```
 
-## Runing the saas GUI
+## Running the saas GUI
 
 When saas is installed, you can easily launch the GUI from R.
 By default, you can see the GUI by visiting [http://127.0.0.1:3320](http://127.0.0.1:3320)

@@ -1,17 +1,60 @@
-#' Title
+#' Calculate density from pi0 distribution
 #'
+#' @param pi0
 #' @param n_targets
 #' @param n_decoys
-#' @param pi0
-#'
 #' @return
 #' @export
 #'
 #' @examples
-pi0_likelihood = function(n_targets, n_decoys, pi0) {
+dpi0= function(pi0, n_targets, n_decoys) {
   dbeta(pi0 / (1 + pi0), n_decoys + 1, n_targets + 1) *
     1 / (1 + pi0) ^ 2 /
     pbeta(.5, n_decoys + 1, n_targets + 1)
+}
+
+##' sample from pi0 distribution
+##'
+##' .. content for \details{} ..
+##' @param n
+##' @param n_targets
+##' @param n_decoys
+##' @return
+##' @export
+rpi0 = function(n, n_targets, n_decoys) {
+  x = as.numeric()
+  ## sample until n samples has been reached
+  while(n > 0){
+    xt = rbeta(n,n_decoys + 1,n_targets + 1)
+    ## remove samples outside 0-.5 boundary
+    xt = xt[xt<.5]
+    xt = xt/(1-xt)
+    x = c(x,xt)
+    n = n - length(xt)
+  }
+  return(x)
+}
+
+#' Title
+#'
+#' @param n
+#' @param pi0
+#' @param sims
+#'
+#' @return
+#' @export
+#' @import tibble
+#' @examples
+simulate_subset = function(n,pi0,sims = 1){
+  pi0D = 2*pi0/(1+pi0)
+  min_n = rbinom(sims ,n , pi0D)
+  data_frame(
+    n,
+    pi0,
+    decoy_n =rbinom(sims, min_n, .5),
+    target_n = n - decoy_n,
+    H0_n = min_n - decoy_n,
+    H1_n = target_n - H0_n)
 }
 
 #' Calculate qvalues of the subset PSMs.
@@ -60,7 +103,7 @@ calculate_fdr = function(df,score_higher = TRUE) {
     select(-index)
 }
 
-#' Title
+#' Creates density plot of the pi0 distribution
 #'
 #' @param n_targets
 #' @param n_decoys
@@ -71,7 +114,7 @@ calculate_fdr = function(df,score_higher = TRUE) {
 #' @examples
 pi0plot = function(n_targets, n_decoys) {
   grid = seq(0, 1, .001)
-  dens = pi0_likelihood(n_targets, n_decoys, grid)
+  dens = dpi0(grid, n_targets, n_decoys)
   df = data_frame(grid, dens)
   ggplot(df, aes(x = grid, y = dens)) + geom_line(col = 'dark grey') +
     geom_vline(xintercept = (n_decoys + 1) / (n_targets + 1),
@@ -90,7 +133,7 @@ pi0plot = function(n_targets, n_decoys) {
     )
 }
 
-#' Title
+#' Creates PP plot of two empirical distributions
 #'
 #' @param score
 #' @param label
@@ -169,27 +212,6 @@ plot_diag = function(df){
               decoyall_decoy_subset = p3, decoysubset_target_subset = p4, all = p_all))
 }
 
-#' Title
-#'
-#' @param n
-#' @param pi0
-#' @param sims
-#'
-#' @return
-#' @export
-#' @import tibble
-#' @examples
-simulate_subset = function(n,pi0,sims = 1){
-  pi0D = 2*pi0/(1+pi0)
-  min_n = rbinom(sims ,n , pi0D)
-  data_frame(
-    n,
-    pi0,
-    decoy_n =rbinom(sims, min_n, .5),
-    target_n = n - decoy_n,
-    H0_n = min_n - decoy_n,
-    H1_n = target_n - H0_n)
-}
 
 #' Title
 #'
@@ -242,6 +264,54 @@ sample_dataset = function(H1_n = 160,H0_n = 40, decoy_n = H0_n ,decoy_large_n = 
                subset = TRUE)
   bind_rows(d1,d2,d3,d4)
   }
+  }
+
+#' plots the theoretical distribution of all components in the PSM distribution
+#' @param H0_mean
+#' @param H1_mean
+#' @param H0_sd
+#' @param H1_sd
+#' @param decoy_mean
+#' @param decoy_sd
+#' @param decoy_large_mean
+#' @param decoy_large_sd
+#' @return
+#' @export
+#' @import dplyr
+#' @import ggplot2
+#' @examples
+plot_theo_dist2 = function(H0_mean=2.75, H1_mean=3.31,H0_sd=.13,H1_sd=.28,
+                          decoy_mean = H0_mean, decoy_sd = H0_sd,
+                          decoy_extra_mean = H0_mean, decoy_extra_sd = H0_sd){
+
+    ## make grid of scores
+  d = data_frame(score = seq(1,5,.01))
+  ## calculate theoretical density for eacht dist
+
+ d = bind_rows(
+    mutate(d,dens = dnorm(score,H1_mean,H1_sd),
+           PSMs = 'correct subset')
+    ,
+    mutate(d,dens = dnorm(score,H0_mean,H0_sd),
+           PSMs = 'incorrect subset')
+    ,
+    mutate(d,dens = dnorm(score,decoy_mean,decoy_sd),
+           PSMs = 'subset decoy')
+    ,
+    mutate(d,dens = dnorm(score,decoy_extra_mean,decoy_extra_sd),
+           PSMs = 'extra decoy')
+  )
+
+ d = mutate(d,PSMs = factor(PSMs,levels = unique(d$PSMs)))
+  p1 = ggplot(d,aes(score,dens,col = PSMs,size = PSMs,linetype = PSMs)) + geom_line() +
+    labs(x = 'Score',y = 'Density') +
+    theme(axis.title = element_text(size = rel(1.2)), axis.title.y = element_text(angle = 0),
+          legend.position = 'top') +
+    scale_size_manual(values=c(4,4,1,1))+
+    scale_linetype_manual(values=c(1,1,1,2)) +
+    scale_color_manual(values = c('green','red','orange','blue'))
+  print(p1)
+  list(data = d,plot = p1)
   }
 
 
@@ -312,23 +382,3 @@ plot_theo_dist = function(H1_n = 160,H0_n = 40, decoy_n = H0_n ,decoy_large_n = 
   print(p1)
   list(data = d,plot = p1)
   }
-
-
-#' Launches the GUI version of saas.
-#'
-#' To easily launch the GUI outside an R session (eg. on a server),
-#' you can run R -e "library(saas);saas_gui()" from the terminal (on linux/mac).
-#'
-#' see ?shiny::runApp for help all parameters.
-#'
-#' @param port
-#' @param host
-#' @param ...
-#'
-#' @return
-#' @export
-#'
-#' @examples
-saas_gui = function(port = 3320, host  = "0.0.0.0",...){
-  shiny::runApp(system.file('saas_gui', package='saas'),port = port, host  = host, ...)
-}
