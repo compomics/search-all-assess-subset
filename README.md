@@ -28,7 +28,6 @@ library(saas)
 saas_gui()
 ```
 Or if you want to run saas immediately from the terminal.
-
 ```r
  R -e "library(saas);saas_gui()"
 ```
