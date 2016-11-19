@@ -13,7 +13,6 @@ install.packages("devtools")
 
 Then install saas using the `install_github` function in the
 [devtools](https://cran.r-project.org/package=devtools) package.
-
 ```r
 library(devtools)
 install_github("compomics/search-all-assess-subset")
