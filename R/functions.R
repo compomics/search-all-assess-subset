@@ -262,8 +262,8 @@ sample_dataset = function(H1_n = 160,H0_n = 40, decoy_n = H0_n ,decoy_large_n = 
                decoy = FALSE,
                H0 = FALSE,
                subset = TRUE)
-  bind_rows(d1,d2,d3,d4)
   }
+  bind_rows(d1,d2,d3,d4)
   }
 
 #' plots the theoretical distribution of all components in the PSM distribution
