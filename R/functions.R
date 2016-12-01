@@ -85,19 +85,17 @@ calculate_fdr = function(df,score_higher = TRUE) {
     # Sort the score depending on if higher scores are better or not
     arrange(desc(if (score_higher) score else -score)) %>%
     # Calculate classical FDR on subset
-    mutate(FDR = ifelse((subset == 1) & (decoy == 0),
-                        cummax(cumsum(decoy == 1) /
-                                 cumsum(decoy != 1)), NA)) %>%
+    mutate(FDR = cummax(cumsum((decoy == 1) & (subset == 1)) /
+                        cumsum((decoy != 1) & (subset == 1)))) %>%
     # calculate BH FDR on subset
-    mutate(FDR_BH = ifelse((subset == 1) & (decoy == 0),
-                           cummax((cumsum(decoy == 1) / max(decoy == 1)) /
-                                    (cumsum(decoy != 1) / decoy != 1)),
-                           NA)) %>%
+    mutate(FDR_BH = cummax((cumsum(decoy == 1) / max(decoy == 1)) /
+                           (cumsum((decoy != 1) & (subset == 1)) / max((decoy != 1) & (subset == 1))))) %>%
     # calculate stable FDR on subset
     mutate(FDR_stable = FDR_BH * pi_0_cons) %>%
-    ## Does not allow any FDR to be above 1
+    ## Does not allow any FDR to be above 1 and set fdr of decoys and non subset PSMs to NA
     mutate_at(vars(FDR, FDR_BH, FDR_stable),
-              funs(ifelse((. > 1) & !is.na(.), 1, .))) %>%
+              funs(ifelse(!((decoy == 0) & (subset == 1)), NA,
+                   ifelse(. > 1 , 1, .)))) %>%
     # Put dataframe back in original order
     ungroup %>% arrange(index) %>%
     select(-index)
