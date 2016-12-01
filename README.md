@@ -1,7 +1,7 @@
 # search-all-assess-subset
 An implementation of the Search All, Asses Subset strategy for FDR estimation in shotgun proteomics.
 
-An userfriendly GUI version of saas is hosted [here](http://iomics.ugent.be/saas/).
+A user-friendly GUI version of saas is hosted [here](http://iomics.ugent.be/saas/).
 
 ## Installation
 
