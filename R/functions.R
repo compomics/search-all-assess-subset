@@ -88,8 +88,8 @@ calculate_fdr = function(df,score_higher = TRUE) {
     mutate(FDR = cummax(cumsum((decoy == 1) & (subset == 1)) /
                         cumsum((decoy != 1) & (subset == 1)))) %>%
     # calculate BH FDR on subset
-    mutate(FDR_BH = cummax((cumsum(decoy == 1) / max(decoy == 1)) /
-                           (cumsum((decoy != 1) & (subset == 1)) / max((decoy != 1) & (subset == 1))))) %>%
+    mutate(FDR_BH = cummax((cumsum(decoy == 1) / sum(decoy == 1)) /
+                           (cumsum((decoy != 1) & (subset == 1)) / sum((decoy != 1) & (subset == 1))))) %>%
     # calculate stable FDR on subset
     mutate(FDR_stable = FDR_BH * pi_0_cons) %>%
     ## Does not allow any FDR to be above 1 and set fdr of decoys and non subset PSMs to NA
