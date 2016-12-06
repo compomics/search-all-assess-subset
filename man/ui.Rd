@@ -7,6 +7,7 @@
 ui()
 }
 \description{
-.. content for \details{} ..
+UI shiny app
 }
+\keyword{internal}
 

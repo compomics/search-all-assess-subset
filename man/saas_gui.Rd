@@ -7,13 +7,10 @@
 saas_gui(options = list(port = 3320, host = "0.0.0.0"))
 }
 \arguments{
-\item{options}{See help of shiny::shinyApp for details}
+\item{options}{See help of shiny::shinyApp for more details on available options}
 }
 \description{
 To easily launch the GUI outside an R session (eg. on a server),
 you can run R -e "library(saas);saas_gui()" from the terminal (on linux/mac).
-}
-\details{
-see ?shiny::runApp for help all parameters.
 }
 

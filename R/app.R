@@ -1,29 +1,13 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-
 ##' .. content for \description{} (no empty lines) ..
 ##'
 ##' .. content for \details{} ..
 ##' @param rawinput
 ##' @param sep
 ##' @return
+##' @keywords internal
 ##' @author
 check_input = function(rawinput,sep = ','){
-  df = try({read.csv(text = rawinput,sep = sep)})
+  df = try({read.csv(text = rawinput,sep = sep)},silent = TRUE)
   if (class(df) == 'try-error'){return('cannot read input')}
   if(any(!(c('id','score','decoy','subset') %in% colnames(df))))
     {return('missing columns or wrong column names')}
@@ -34,17 +18,16 @@ check_input = function(rawinput,sep = ','){
   if(!any((df$decoy  == 0))) {return('No targets available')}
   if(!any((df$subset  == 1))) {return('No subset PSMs indicated')}
   if(!any((df$decoy[df$subset == 1]  == 1))) {return('No subset decoys available')}
-##  return(df)
   return('Data format correct')
 }
 ##' server
 ##'
-##' .. content for \details{} ..
 ##' @param input
 ##' @param output
 ##' @param session
 ##' @return
 ##' @author
+##' @keywords internal
 server = function(input, output, session) {
   observe({cat(input$tabs, '\n')})
   ## logic data input tab
@@ -122,7 +105,7 @@ observe({
 #                                                    'You need at least 1 decoy or target to visualize the diagnostic plots!')})
 
 output$plot_theo = renderPlot({
-  plot_theo_dist2(
+  plot_theo_dist(
                  H0_mean = input$H0_mean,
                  H1_mean = input$H1_mean,
                  H0_sd = input$H0_sd,
@@ -166,9 +149,9 @@ output$plot_theo = renderPlot({
 
 ##' UI shiny app
 ##'
-##' .. content for \details{} ..
 ##' @return
 ##' @author
+##' @keywords internal
 ui = function() fluidPage(navbarPage(
   "Search All, Assess Subset",
   tabPanel('Data input',
@@ -378,9 +361,8 @@ mainPanel(width = 12,
 #' To easily launch the GUI outside an R session (eg. on a server),
 #' you can run R -e "library(saas);saas_gui()" from the terminal (on linux/mac).
 #'
-#' see ?shiny::runApp for help all parameters.
 #'
-#' @param options See help of shiny::shinyApp for details
+#' @param options See help of shiny::shinyApp for more details on available options
 #' @return
 #' @export
 #' @import shiny

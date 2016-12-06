@@ -7,6 +7,7 @@
 server(input, output, session)
 }
 \description{
-.. content for \details{} ..
+server
 }
+\keyword{internal}
 

@@ -2,14 +2,29 @@
 % Please edit documentation in R/functions.R
 \name{simulate_subset}
 \alias{simulate_subset}
-\title{Title}
+\title{Random generation of a dataset after TDA.}
 \usage{
 simulate_subset(n, pi0, sims = 1)
 }
 \arguments{
-\item{sims}{}
+\item{n}{number of total PSMs.}
+
+\item{pi0}{theoretical \eqn{\pi_0}.}
+
+\item{sims}{number of observations.}
+}
+\value{
+A data frame with ``sims'' rows and 6 rows:
+\describe{
+  \item{n}{number of PSMs.}
+  \item{pi0}{theoretical \eqn{\pi_0}.}
+  \item{decoy_n}{number of decoy PSMs.}
+  \item{target_n}{number of target PSMs.}
+  \item{H0_n}{number of incorrect target PSMs.}
+  \item{H1_n}{number of correct target PSMs.}
+}
 }
 \description{
-Title
+Random generation of number of decoy, correct target and incorrect target PSMs target PSMs after a competitive target-decoy search.
 }
 

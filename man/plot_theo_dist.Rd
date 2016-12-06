@@ -2,17 +2,13 @@
 % Please edit documentation in R/functions.R
 \name{plot_theo_dist}
 \alias{plot_theo_dist}
-\title{Title}
+\title{plots the theoretical distribution of all components in the PSM distribution}
 \usage{
-plot_theo_dist(H1_n = 160, H0_n = 40, decoy_n = H0_n,
-  decoy_large_n = 2000, H0_mean = 2.75, H1_mean = 3.31, H0_sd = 0.13,
+plot_theo_dist(H0_mean = 2.75, H1_mean = 3.31, H0_sd = 0.13,
   H1_sd = 0.28, decoy_mean = H0_mean, decoy_sd = H0_sd,
-  decoy_large_mean = H0_mean, decoy_large_sd = H0_sd)
-}
-\arguments{
-\item{decoy_large_sd}{}
+  decoy_extra_mean = H0_mean, decoy_extra_sd = H0_sd)
 }
 \description{
-Title
+plots the theoretical distribution of all components in the PSM distribution
 }
 

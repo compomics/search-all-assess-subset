@@ -2,22 +2,35 @@
 % Please edit documentation in R/functions.R
 \name{calculate_fdr}
 \alias{calculate_fdr}
-\title{Calculate qvalues of the subset PSMs.}
+\title{Calculate qvalues on the subset PSMs.}
 \usage{
 calculate_fdr(df, score_higher = TRUE)
 }
 \arguments{
-\item{df}{A dataframe with at least the columns scores from decoy and subset target PSMs (see details)}
+\item{df}{dataframe with at least 3 columns:
+\describe{
+\item{score}{score assigned to the peptide to spectrum match (PSM).}
+\item{subset}{TRUE or 1 if PSM belongs to the subset in interest, FALSE or 0 otherwise.}
+\item{decoy}{TRUE or 1 if decoy PSM, FALSE or 0 otherwise.}
+}
+Additional columns are allowed but ignored.
+Target and decoy PSMs are assumbed to be from a competitive target decoy database search.}
 
-\item{score_higher}{TRUE if higher scores mean a better peptide sequence match.}
+\item{score_higher}{TRUE if a higher score means a better PSM.}
 }
 \value{
-A data frame containing the collumns from the original input,
-A column with the conservative pi_0 estimation,
-the estimated qvalues from the stable FDR estimation strategy using the conservative pi_0 estimator and a large decoy set.
-Lastly, a column containing qvalues estimated with the Benjamini Hochbergh procedure.
+A data frame containing all columns in ``df''.
+Following columns are added:
+\describe{
+\item{pi_0_cons}{conservative estimation of \eqn{\pi_0}.}
+\item{FDR}{estimated subset PSM qvalues calculated according the competitive target decoy approach.}
+\item{FDR_BH}{estimated subset PSM qvalues calculated according the Benjamini Hochbergh procedure.
+When provided, non-subset decoy PSMs are used to stabilize estimates in small subsets}
+\item{FDR_stable}{estimated subset PSM qvalues calculated with ``pi_0_cons''.
+When provided, non-subset decoy PSMs are used to stabilize estimates in small subsets}
+}
 }
 \description{
-Calculate qvalues of the subset PSMs.
+Calculate qvalues on the subset PSMs.
 }
 

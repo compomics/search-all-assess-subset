@@ -2,14 +2,21 @@
 % Please edit documentation in R/functions.R
 \name{plot_diag}
 \alias{plot_diag}
-\title{Title}
+\title{Plot diagnostic plots to evaluate assumptions from the search all, search subset strategy.}
 \usage{
 plot_diag(df)
 }
 \arguments{
-\item{df}{}
+\item{df}{dataframe with at least 3 columns:
+\describe{
+\item{score}{score assigned to the peptide to spectrum match (PSM).}
+\item{subset}{TRUE or 1 if PSM belongs to the subset in interest, FALSE or 0 otherwise.}
+\item{decoy}{TRUE or 1 if decoy PSM, FALSE or 0 otherwise.}
+}
+Additional columns are allowed but ignored.
+Target and decoy PSMs are assumbed to be from a competitive target decoy database search.}
 }
 \description{
-Title
+Plot diagnostic plots to evaluate assumptions from the search all, search subset strategy.
 }
 

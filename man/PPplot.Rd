@@ -8,7 +8,20 @@ PPplot(score, label, pi0 = 0, title = "PP plot of target PSMs",
   xlab = "Decoy percentile", ylab = "Target\\npercentile")
 }
 \arguments{
-\item{ylab}{}
+\item{score}{vector of quantiles of distribution 1 and 2}
+
+\item{label}{vector of logical values. TRUE if score belongs to distribution 1}
+
+\item{pi0}{mixture coefficient of distribution 1 in distribution 2}
+
+\item{title}{main title.}
+
+\item{xlab}{label on x-axis.}
+
+\item{ylab}{label on y-axis.}
+}
+\value{
+ggplot object
 }
 \description{
 Creates PP plot of two empirical distributions

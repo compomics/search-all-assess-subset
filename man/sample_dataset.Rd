@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{sample_dataset}
 \alias{sample_dataset}
-\title{Title}
+\title{Sample scores for a random dataset}
 \usage{
 sample_dataset(H1_n = 160, H0_n = 40, decoy_n = H0_n,
   decoy_large_n = 2000, H0_mean = 2.75, H1_mean = 3.31, H0_sd = 0.13,
@@ -10,9 +10,32 @@ sample_dataset(H1_n = 160, H0_n = 40, decoy_n = H0_n,
   decoy_large_mean = H0_mean, decoy_large_sd = H0_sd)
 }
 \arguments{
-\item{decoy_large_sd}{}
+\item{H1_n}{number of correct subset target PSMs.}
+
+\item{H0_n}{number of incorrect subset target PSMs.}
+
+\item{decoy_n}{number of subset decoy PSMs.}
+
+\item{decoy_large_n}{number of non subset decoy PSMs.}
+
+\item{H0_mean}{mean of the incorrect subset target PSM distribution.}
+
+\item{H1_mean}{mean of the correct subset target PSM distribution.}
+
+\item{H0_sd}{sd of the incorrect subset target PSM distribution.}
+
+\item{H1_sd}{sd of the correct subset target PSM distribution.}
+
+\item{decoy_mean}{mean of the subset decoy PSM distribution.}
+
+\item{decoy_sd}{sd of the subset decoy PSM distribution.}
+
+\item{decoy_large_mean}{mean of the non subset decoy PSM distribution.}
+
+\item{decoy_large_sd}{sd of the non subset decoy PSM distribution.}
 }
 \description{
-Title
+The scores are sampled from two-component mixture distribution of Gaussians.
 }
+\keyword{internal}
 

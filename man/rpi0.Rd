@@ -2,11 +2,22 @@
 % Please edit documentation in R/functions.R
 \name{rpi0}
 \alias{rpi0}
-\title{sample from pi0 distribution}
+\title{Random generation for the pi0 distribution}
 \usage{
 rpi0(n, n_targets, n_decoys)
 }
+\arguments{
+\item{n}{number of observations.}
+
+\item{n_targets}{number of observed target PSMs.}
+
+\item{n_decoys}{number of observed decoy PSMs.}
+}
+\value{
+vector of random deviates.
+The length equals `n'.
+}
 \description{
-.. content for \details{} ..
+Random generation for the pi0 distribution
 }
 

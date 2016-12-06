@@ -7,7 +7,12 @@
 pi0plot(n_targets, n_decoys)
 }
 \arguments{
-\item{n_decoys}{}
+\item{n_targets}{vector of observed target PSMs.}
+
+\item{n_decoys}{vector of observed decoy PSMs.}
+}
+\value{
+ggplot object.
 }
 \description{
 Creates density plot of the pi0 distribution

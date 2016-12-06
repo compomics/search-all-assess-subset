@@ -2,11 +2,23 @@
 % Please edit documentation in R/functions.R
 \name{dpi0}
 \alias{dpi0}
-\title{Calculate density from pi0 distribution}
+\title{Density function for the pi0 distribution}
 \usage{
 dpi0(pi0, n_targets, n_decoys)
 }
+\arguments{
+\item{pi0}{vector of quantiles.}
+
+\item{n_targets}{vector of observed target PSMs.}
+
+\item{n_decoys}{vector of observed decoy PSMs.}
+}
+\value{
+vector of densities.
+The length is the maximum length of the numerical arguments.
+Returns 'NaN' for 'pi0 < 0' and 'pi > 1'.
+}
 \description{
-Calculate density from pi0 distribution
+Density function for the pi0 distribution
 }
 
