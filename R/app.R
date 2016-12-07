@@ -189,18 +189,18 @@ Adhere to the following format:
 * Every row contains:
  + **id**: Can be any text or number
  + **score**: Score given to the PSM, higher scores are better
- + **decoy**: 0 or 1; 1 indicates that the PSM matches a decoy peptide sequence
- + **subset**:  0 or 1: 1 indicates that the PSM matches a subset peptide sequence
+ + **decoy**: FALSE or TRUE; TRUE indicates that the PSM matches a decoy peptide sequence
+ + **subset**:  FALSE or TRUE: TRUE indicates that the PSM matches a subset peptide sequence
 * The first row are the column names
 * All columns should be comma separated
 
 Example input:
 <pre>
 id,score,decoy,subset
-1,7.67,1,0
-2,10.99,1,1
-3,75.10,0,0
-4,73.83,0,1
+1,7.67,TRUE,FALSE
+2,10.99,TRUE,TRUE
+3,75.10,FALSE,FALSE
+4,73.83,FALSE,TRUE
 </pre>
 **Warning:** use this tool only with PSMs from a competitive target-decoy search!
 The minimal required input are PSMs from subset targets and decoys (row 2 and 4 in example input).

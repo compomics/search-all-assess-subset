@@ -10,8 +10,8 @@ calculate_fdr(df, score_higher = TRUE)
 \item{df}{dataframe with at least 3 columns:
 \describe{
 \item{score}{score assigned to the peptide to spectrum match (PSM).}
-\item{subset}{TRUE or 1 if PSM belongs to the subset in interest, FALSE or 0 otherwise.}
-\item{decoy}{TRUE or 1 if decoy PSM, FALSE or 0 otherwise.}
+\item{subset}{TRUE if PSM belongs to the subset in interest, FALSE or otherwise.}
+\item{decoy}{TRUE if decoy PSM, FALSE otherwise.}
 }
 Additional columns are allowed but ignored.
 Target and decoy PSMs are assumbed to be from a competitive target decoy database search.}
