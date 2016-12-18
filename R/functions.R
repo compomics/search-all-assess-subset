@@ -399,11 +399,11 @@ parse_msgf_mzid = function(mzid_path){
 ##' @export
 ##' @author
 id_is_present = function(protein_id,fastapath){
-  fas = stringr::read_lines(fastapath)
+  fas = readr::read_lines(fastapath)
   headers = fas[grepl('>',fas,fixed = TRUE)]
   ## reducing search time by only searching the unique
   protein_id_unique = unique(protein_id)
-  is_subset = sapply(protein_id_unique,function(p){any(stringr::str_detect(headers,fixed(p)))})
+  is_subset = sapply(protein_id_unique,function(p){any(stringr::str_detect(headers,stringr::fixed(p)))})
   protein_id %in% protein_id_unique[is_subset]
 }
 
@@ -439,7 +439,7 @@ preprocess = function(dat,remove_target_decoy_PSM = TRUE, remove_multiple_protei
   if (remove_multiple_proteins_PSM == TRUE){
     dat = group_by(dat,spec_id) %>% filter(n() > 1)
   }
-  if (is.null(is_subset)){
+  if (!is.null(is_subset)){
     dat = ungroup(dat) %>% mutate(subset = id_is_present(protein_id,is_subset))
   }
   if ('subset' %in% names(dat)){
