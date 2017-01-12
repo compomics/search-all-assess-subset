@@ -215,6 +215,7 @@ PPplot = function(score, label, pi0 = 0,title = 'PP plot of target PSMs' ,
 #' @import dplyr
 #' @examples
 plot_diag = function(df){
+  ## TODO add reverse score option
     ## remove non subset targets
     df = filter(df, decoy|subset)
 
@@ -370,6 +371,7 @@ plot_theo_dist = function(H0_mean=2.75, H1_mean=3.31,H0_sd=.13,H1_sd=.28,
 ##' @export
 ##' @author
 parse_msgf_mzid = function(mzid_path){
+## TODO divide number of sequences by 2 (decoys + targets by default)
   if (!requireNamespace("mzR", quietly = TRUE)) {
     stop("Package mzR needed for this function to work. Please install it from bioconductor.",
       call. = FALSE)
@@ -387,7 +389,8 @@ parse_msgf_mzid = function(mzid_path){
               score= MS.GF.SpecEValue,
               database = gsub(".*/+([^/]+).fasta","\\1",levels(database(d)[['location']])),
               decoy = isDecoy,
-              database_size = database(d)$numDatabaseSequences) %>%
+## divide number of sequences by 2 (decoys + targets by default)
+              database_size = database(d)$numDatabaseSequences / 2) %>%
     distinct
 }
 
