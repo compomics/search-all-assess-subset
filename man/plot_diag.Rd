@@ -4,19 +4,31 @@
 \alias{plot_diag}
 \title{Plot diagnostic plots to evaluate assumptions from the search all, search subset strategy.}
 \usage{
-plot_diag(df)
+plot_diag(df, score_higher = TRUE)
 }
-\arguments{
-\item{df}{dataframe with at least 3 columns:
-\describe{
-\item{score}{score assigned to the peptide to spectrum match (PSM).}
-\item{subset}{TRUE if PSM belongs to the subset in interest, FALSE otherwise.}
-\item{decoy}{TRUE if decoy PSM, FALSE otherwise.}
-}
-Additional columns are allowed but ignored.
-Target and decoy PSMs are assumbed to be from a competitive target decoy database search.}
+\value{
+ggplot object.
 }
 \description{
-Plot diagnostic plots to evaluate assumptions from the search all, search subset strategy.
+Four diagnostic plots are created:
+\describe{
+\item{a}{pi0plot according the number of subset target and decoy PSMs.}
+\item{b}{PPplot of the decoy distribution against the subset target distribution.}
+\item{c}{PPplot of the decoy distribution against the subset decoy distribution.}
+\item{d}{PPplot of the subset decoy distribution against the subset target distribution.}
+}
+}
+\examples{
+
+
+## Simulate a dataset with 140 correct target subset PSMs, 60 incorrect target subset PSMS,
+## 60 decoy subset PSMs and 2000 additional decoy PSMs.
+set.seed(10)
+d = sample_dataset(H1_n = 140,H0_n = 60, decoy_n = 60 ,decoy_large_n = 2000,
+                   H0_mean = 2.7, H1_mean = 3.2, decoy_mean = 2.7, decoy_large_mean = 2.7)
+##pi_0 can be estimated with the target-decoy aproach
+
+plot_diag(d)
+
 }
 

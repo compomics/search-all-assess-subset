@@ -2,12 +2,12 @@
 % Please edit documentation in R/functions.R
 \name{dpi0}
 \alias{dpi0}
-\title{Density function for the pi0 distribution}
+\title{Density function for the \eqn{\pi_0} distribution.}
 \usage{
 dpi0(pi0, n_targets, n_decoys)
 }
 \arguments{
-\item{pi0}{vector of quantiles.}
+\item{pi0}{vector of \eqn{\pi_0} quantiles.}
 
 \item{n_targets}{vector of observed target PSMs.}
 
@@ -19,6 +19,19 @@ The length is the maximum length of the numerical arguments.
 Returns 'NaN' for 'pi0 < 0' and 'pi > 1'.
 }
 \description{
-Density function for the pi0 distribution
+Density function for the \eqn{\pi_0} distribution.
+}
+\examples{
+
+## density at pi0 = .5 when observing 10 targets and 3 decoys
+dpi0(.5, 10, 3)
+
+## visualize the pi0 distribution when observing 10 targets and 3 decoys
+grid = seq(0,1,.01)
+dens = dpi(grid,10 , 3)
+plot(dens, xlab = 'pi0', ylab = 'density')
+##Alternatively, you can also use the function pi0plot()
+pi0plot(10,3)
+
 }
 

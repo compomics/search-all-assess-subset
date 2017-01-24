@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{rpi0}
 \alias{rpi0}
-\title{Random generation for the pi0 distribution}
+\title{Random generation for the \eqn{\pi_0} distribution.}
 \usage{
 rpi0(n, n_targets, n_decoys)
 }
@@ -18,6 +18,13 @@ vector of random deviates.
 The length equals `n'.
 }
 \description{
-Random generation for the pi0 distribution
+Random generation for the \eqn{\pi_0} distribution.
+}
+\examples{
+
+## visualize the pi0 distribution when observing 10 targets and 3 decoys
+x = rpi0(100000, 10 ,3 )
+hist(x, breaks = 50 , xlab = 'pi0', ylab = 'counts')
+
 }
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{calculate_fdr}
 \alias{calculate_fdr}
-\title{Calculate qvalues on the subset PSMs.}
+\title{Calculates qvalues on the subset PSMs.}
 \usage{
 calculate_fdr(df, score_higher = TRUE)
 }
@@ -31,6 +31,19 @@ When provided, non-subset decoy PSMs are used to stabilize estimates in small su
 }
 }
 \description{
-Calculate qvalues on the subset PSMs.
+Calculates qvalues on the subset PSMs.
+}
+\examples{
+
+## Simulate a dataset with 140 correct target subset PSMs, 60 incorrect target subset PSMS,
+## 60 decoy subset PSMs and 2000 additional decoy PSMs.
+set.seed(10)
+d = sample_dataset(H1_n = 140,H0_n = 60, decoy_n = 60 ,decoy_large_n = 2000,
+                   H0_mean = 2.7, H1_mean = 3, decoy_mean = 2.7, decoy_large_mean = 2.7)
+
+## calculate the qvalues in the subset target PSMS according the classical target-decoy approach
+## and our more stable estimation method.
+calculate_fdr(d)
+
 }
 

@@ -31,4 +31,29 @@ Every spectrum haves only 1 row in the data frame.
 \description{
 The parsed data frame from saas::parse_msgf_mzid function contains sometimes multiple entries for a spectrum. (eg. if sequence can be assigned to multiple protein ids). This function takes care of this by default.
 }
+\examples{
+
+## Location of the zipped data files
+zip_file_path = system.file("extdata", "extdata.zip", package = "saas")
+
+## Unzip and get the (temporary) location of the mzid file with the MS-GF+ search results from a
+## competitive target decoy search of the complete pyrococcus proteome against a pyrococcus dataset.
+mzid_file_path = unzip(zip_file_path, 'pyrococcus.mzid',exdir = tempdir())
+## Parse the mzid file
+dat = parse_msgf_mzid(mzid_file_path)
+
+## Unzip and get the (temporary) location of the file with fasta headers.
+## Each fasta header contains a protein_id from the protein subset of interest.
+## These protein_ids match the protein_ids in the mzid result file.
+fasta_file_path = unzip(zip_file_path, 'transferase_activity_[GO:0016740].fasta', exdir = tempdir())
+
+## Preprocess the data before FDR estimation.
+data_prep = preprocess(dat, is_subset = fasta_file_path)
+
+## Estimate the FDR in the subset.
+data_result = calculate_fdr(data_prep, score_higher = FALSE)
+## Check how many PSMs are retained at the 1\% FDR threshold.
+table(data_result$FDR_stable < .01)
+
+}
 

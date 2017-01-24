@@ -26,4 +26,16 @@ See \url{https://omics.pnl.gov/software/ms-gf}
 for more info on how to perform a database search on MSMS dataset with MS-GF+ and how to generate a mzID file.
 Note that most functions in these package require data from a competitive target decoy search.
 }
+\examples{
+
+## Location of the zipped data files
+zip_file_path = system.file("extdata", "extdata.zip", package = "saas")
+
+## Unzip and get the (temporary) location of the mzid file with the MS-GF+ search results from a
+## competitive target decoy search of the complete pyrococcus proteome against a pyrococcus dataset.
+mzid_file_path = unzip(zip_file_path, 'pyrococcus.mzid',exdir = tempdir())
+## Parse the mzid file
+parse_msgf_mzid(mzid_file_path)
+
+}
 

@@ -35,7 +35,34 @@ sample_dataset(H1_n = 160, H0_n = 40, decoy_n = H0_n,
 \item{decoy_large_sd}{sd of the non subset decoy PSM distribution.}
 }
 \description{
-The scores are sampled from two-component mixture distribution of Gaussians.
+The scores are sampled from a two-component mixture distribution of Gaussians.
+}
+\examples{
+
+## Simulate a dataset with 140 correct target subset PSMs, 60 incorrect target subset PSMS,
+##60 decoy subset PSMs and 2000 additional decoy PSMs.
+## In this first example, incorrect subset target and decoy PSMs have a similar distribution
+set.seed(10)
+d = sample_dataset(H1_n = 140,H0_n = 60, decoy_n = 60 ,decoy_large_n = 2000,
+                   H0_mean = 2.7, H1_mean = 3, decoy_mean = 2.7, decoy_large_mean = 2.7)
+# visualize the decoy distribution and the correct and incorrect target distribution
+plot(density(d$score[d$decoy]), xlim = c(2,4), xlab = 'score', ylab = 'density')
+lines(density(d$score[!d$decoy & d$H0]), col = 'red')
+lines(density(d$score[!d$decoy & !d$H0]), col = 'green')
+legend('topright', c('decoys', 'incorrect targets', 'correct targets'),
+       text.col = c('black', 'red', 'green'))
+## In this first example, incorrect subset target and decoy PSMs have not a similar distribution
+## because the additional set of decoy PSMs are not representative for the incorrect subset PSMs.
+set.seed(10)
+d = sample_dataset(H1_n = 140,H0_n = 60, decoy_n = 60 ,decoy_large_n = 2000,
+                   H0_mean = 2.7, H1_mean = 3, decoy_mean = 2.7, decoy_large_mean = 2.6)
+# visualize the decoy distribution and the correct and incorrect target distribution
+plot(density(d$score[d$decoy]), xlim = c(2,4), xlab = 'score', ylab = 'density')
+lines(density(d$score[!d$decoy & d$H0]), col = 'red')
+lines(density(d$score[!d$decoy & !d$H0]), col = 'green')
+legend('topright', c('decoys', 'incorrect targets', 'correct targets'),
+       text.col = c('black', 'red', 'green'))
+
 }
 \keyword{internal}
 

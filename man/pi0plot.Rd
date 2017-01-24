@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{pi0plot}
 \alias{pi0plot}
-\title{Creates density plot of the pi0 distribution}
+\title{Creates density plot of the pi0 distribution.}
 \usage{
 pi0plot(n_targets, n_decoys)
 }
@@ -15,6 +15,13 @@ pi0plot(n_targets, n_decoys)
 ggplot object.
 }
 \description{
-Creates density plot of the pi0 distribution
+There is also a vertical line plotted that represent a conservative \eqn{\pi_0} estimate.
+This estimate is used in our more stable FDR estimation in the subset PSMs of interest.
+}
+\examples{
+
+## Visualize the pi0 distribution when observing 10 targets and 3 decoys
+## pi0plot(10,3)
+
 }
 

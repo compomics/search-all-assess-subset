@@ -2,10 +2,11 @@
 % Please edit documentation in R/functions.R
 \name{PPplot}
 \alias{PPplot}
-\title{Creates PP plot of two empirical distributions}
+\title{Creates PP plot of two empirical distributions.}
 \usage{
-PPplot(score, label, pi0 = 0, title = "PP plot of target PSMs",
-  xlab = "Decoy percentile", ylab = "Target\\npercentile")
+PPplot(score, label, pi0 = 0, score_higher = TRUE,
+  title = "PP plot of target PSMs", xlab = "Decoy percentile",
+  ylab = "Target\\npercentile")
 }
 \arguments{
 \item{score}{vector of quantiles of distribution 1 and 2}
@@ -13,6 +14,8 @@ PPplot(score, label, pi0 = 0, title = "PP plot of target PSMs",
 \item{label}{vector of logical values. TRUE if score belongs to distribution 1}
 
 \item{pi0}{mixture coefficient of distribution 1 in distribution 2}
+
+\item{score_higher}{TRUE if a higher score means a better PSM.}
 
 \item{title}{main title.}
 
@@ -24,6 +27,19 @@ PPplot(score, label, pi0 = 0, title = "PP plot of target PSMs",
 ggplot object
 }
 \description{
-Creates PP plot of two empirical distributions
+Creates PP plot of two empirical distributions.
+}
+\examples{
+
+## Simulate a dataset with 140 correct target subset PSMs, 60 incorrect target subset PSMS,
+## 60 decoy subset PSMs and 2000 additional decoy PSMs.
+set.seed(10)
+d = sample_dataset(H1_n = 140,H0_n = 60, decoy_n = 60 ,decoy_large_n = 2000,
+                   H0_mean = 2.7, H1_mean = 3, decoy_mean = 2.7, decoy_large_mean = 2.7)
+
+##pi_0 can be estimated with the target-decoy approach
+pi0 = sum(d$decoy & d$subset)/sum(!d$decoy & d$subset)
+PPplot(d$score, d$decoy, pi0)
+
 }
 

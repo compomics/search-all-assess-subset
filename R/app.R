@@ -20,6 +20,57 @@ check_input = function(rawinput,sep = ','){
   if(!any((df$decoy[df$subset == 1]  == 1))) {return('No subset decoys available')}
   return('Data format correct')
 }
+
+#' plots the theoretical distribution of all components in the PSM distribution.
+#'
+#' @param H0_mean
+#' @param H1_mean
+#' @param H0_sd
+#' @param H1_sd
+#' @param decoy_mean
+#' @param decoy_sd
+#' @param decoy_large_mean
+#' @param decoy_large_sd
+#' @return
+##' @keywords internal
+#' @import dplyr
+#' @import ggplot2
+#' @examples
+plot_theo_dist = function(H0_mean=2.75, H1_mean=3.31,H0_sd=.13,H1_sd=.28,
+                          decoy_mean = H0_mean, decoy_sd = H0_sd,
+                          decoy_extra_mean = H0_mean, decoy_extra_sd = H0_sd){
+
+    ## make grid of scores
+  d = data_frame(score = seq(1,5,.01))
+  ## calculate theoretical density for eacht dist
+
+ d = bind_rows(
+    mutate(d,dens = dnorm(score,H1_mean,H1_sd),
+           PSMs = 'correct subset')
+    ,
+    mutate(d,dens = dnorm(score,H0_mean,H0_sd),
+           PSMs = 'incorrect subset')
+    ,
+    mutate(d,dens = dnorm(score,decoy_mean,decoy_sd),
+           PSMs = 'subset decoy')
+    ,
+    mutate(d,dens = dnorm(score,decoy_extra_mean,decoy_extra_sd),
+           PSMs = 'extra decoy')
+  )
+
+ d = mutate(d,PSMs = factor(PSMs,levels = unique(d$PSMs)))
+  p1 = ggplot(d,aes(score,dens,col = PSMs,size = PSMs,linetype = PSMs)) + geom_line() +
+    labs(x = 'Score',y = 'Density') +
+    theme(axis.title = element_text(size = rel(1.2)), axis.title.y = element_text(angle = 0),
+          legend.position = 'top') +
+    scale_size_manual(values=c(4,4,1,1))+
+    scale_linetype_manual(values=c(1,1,1,2)) +
+    scale_color_manual(values = c('green','red','orange','blue'))
+  print(p1)
+  list(data = d,plot = p1)
+}
+
+
 ##' server
 ##'
 ##' @param input

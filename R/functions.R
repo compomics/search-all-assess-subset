@@ -1,6 +1,6 @@
-#' Density function for the pi0 distribution
+#' Density function for the \eqn{\pi_0} distribution.
 #'
-#' @param pi0 vector of quantiles.
+#' @param pi0 vector of \eqn{\pi_0} quantiles.
 #' @param n_targets vector of observed target PSMs.
 #' @param n_decoys vector of observed decoy PSMs.
 #' @return vector of densities.
@@ -9,6 +9,17 @@
 #' @export
 #'
 #' @examples
+#'
+#' ## density at pi0 = .5 when observing 10 targets and 3 decoys
+#' dpi0(.5, 10, 3)
+#'
+#' ## visualize the pi0 distribution when observing 10 targets and 3 decoys
+#' grid = seq(0,1,.01)
+#' dens = dpi(grid,10 , 3)
+#' plot(dens, xlab = 'pi0', ylab = 'density')
+#' ##Alternatively, you can also use the function pi0plot()
+#' pi0plot(10,3)
+#'
 dpi0= function(pi0, n_targets, n_decoys) {
   pi0 = ifelse((pi0 > 1) | (pi0 < 0),NaN,pi0)
   dbeta(pi0 / (1 + pi0), n_decoys + 1, n_targets + 1) *
@@ -16,7 +27,7 @@ dpi0= function(pi0, n_targets, n_decoys) {
     pbeta(.5, n_decoys + 1, n_targets + 1)
 }
 
-##' Random generation for the pi0 distribution
+##' Random generation for the \eqn{\pi_0} distribution.
 ##'
 ##' @param n number of observations.
 ##' @param n_targets number of observed target PSMs.
@@ -24,6 +35,13 @@ dpi0= function(pi0, n_targets, n_decoys) {
 ##' @return vector of random deviates.
 ##' The length equals `n'.
 ##' @export
+##'
+##' @examples
+##'
+##' ## visualize the pi0 distribution when observing 10 targets and 3 decoys
+##' x = rpi0(100000, 10 ,3 )
+##' hist(x, breaks = 50 , xlab = 'pi0', ylab = 'counts')
+##'
 rpi0 = function(n, n_targets, n_decoys) {
   x = as.numeric()
   ## sample until n samples has been reached
@@ -40,7 +58,7 @@ rpi0 = function(n, n_targets, n_decoys) {
 
 #' Random generation of a dataset after TDA.
 #'
-#' Random generation of number of decoy, correct target and incorrect target PSMs target PSMs after a competitive target-decoy search.
+#' Random generation of number of decoy, correct target and incorrect target PSMs after a competitive target-decoy search.
 #'
 #' @param n number of total PSMs.
 #' @param pi0 theoretical \eqn{\pi_0}.
@@ -59,7 +77,12 @@ rpi0 = function(n, n_targets, n_decoys) {
 #' @export
 #' @import tibble
 #' @examples
-simulate_subset = function(n,pi0,sims = 1){
+#'
+#' ## Simulate the number of decoys, correct targets and incorrect targets in 10 datasets that consist of
+#' ## 100 PSMs and that have on average 20% incorrect target PSMs.
+#' simulate_subset(100, .2, 10)
+#'
+simulate_subset = function(n ,pi0 ,sims = 1){
   pi0D = 2*pi0/(1+pi0)
   min_n = rbinom(sims ,n , pi0D)
   data_frame(
@@ -71,7 +94,7 @@ simulate_subset = function(n,pi0,sims = 1){
     H1_n = target_n - H0_n)
 }
 
-#' Calculate qvalues on the subset PSMs.
+#' Calculates qvalues on the subset PSMs.
 #'
 #' @param df dataframe with at least 3 columns:
 #'\describe{
@@ -97,8 +120,19 @@ simulate_subset = function(n,pi0,sims = 1){
 #' @import dplyr
 #'
 #' @examples
+#'
+#' ## Simulate a dataset with 140 correct target subset PSMs, 60 incorrect target subset PSMS,
+#' ## 60 decoy subset PSMs and 2000 additional decoy PSMs.
+#' set.seed(10)
+#' d = sample_dataset(H1_n = 140,H0_n = 60, decoy_n = 60 ,decoy_large_n = 2000,
+#'                    H0_mean = 2.7, H1_mean = 3, decoy_mean = 2.7, decoy_large_mean = 2.7)
+#'
+#' ## calculate the qvalues in the subset target PSMS according the classical target-decoy approach
+#' ## and our more stable estimation method.
+#' calculate_fdr(d)
+#'
 calculate_fdr = function(df,score_higher = TRUE) {
-  d = mutate(
+  mutate(
     df,
     index = row_number(),
     ## pi_0 of subset PSMs
@@ -131,7 +165,10 @@ calculate_fdr = function(df,score_higher = TRUE) {
     select(-index)
 }
 
-#' Creates density plot of the pi0 distribution
+#' Creates density plot of the pi0 distribution.
+#'
+#' There is also a vertical line plotted that represent a conservative \eqn{\pi_0} estimate.
+#' This estimate is used in our more stable FDR estimation in the subset PSMs of interest.
 #'
 #' @param n_targets vector of observed target PSMs.
 #' @param n_decoys vector of observed decoy PSMs.
@@ -140,6 +177,10 @@ calculate_fdr = function(df,score_higher = TRUE) {
 #' @export
 #' @import ggplot2
 #' @examples
+#'
+#' ## Visualize the pi0 distribution when observing 10 targets and 3 decoys
+#' ## pi0plot(10,3)
+#'
 pi0plot = function(n_targets, n_decoys) {
   grid = seq(0, 1, .001)
   dens = dpi0(grid, n_targets, n_decoys)
@@ -161,11 +202,13 @@ pi0plot = function(n_targets, n_decoys) {
     )
 }
 
-#' Creates PP plot of two empirical distributions
+#' Creates PP plot of two empirical distributions.
+#'
 #'
 #' @param score vector of quantiles of distribution 1 and 2
 #' @param label vector of logical values. TRUE if score belongs to distribution 1
 #' @param pi0 mixture coefficient of distribution 1 in distribution 2
+#' @param score_higher TRUE if a higher score means a better PSM.
 #' @param title main title.
 #' @param xlab label on x-axis.
 #' @param ylab label on y-axis.
@@ -174,7 +217,18 @@ pi0plot = function(n_targets, n_decoys) {
 #' @export
 #' @import ggplot2
 #' @examples
-PPplot = function(score, label, pi0 = 0,title = 'PP plot of target PSMs' ,
+#'
+#' ## Simulate a dataset with 140 correct target subset PSMs, 60 incorrect target subset PSMS,
+#' ## 60 decoy subset PSMs and 2000 additional decoy PSMs.
+#' set.seed(10)
+#' d = sample_dataset(H1_n = 140,H0_n = 60, decoy_n = 60 ,decoy_large_n = 2000,
+#'                    H0_mean = 2.7, H1_mean = 3, decoy_mean = 2.7, decoy_large_mean = 2.7)
+#'
+#' ##pi_0 can be estimated with the target-decoy approach
+#' pi0 = sum(d$decoy & d$subset)/sum(!d$decoy & d$subset)
+#' PPplot(d$score, d$decoy, pi0)
+#'
+PPplot = function(score, label, pi0 = 0,score_higher = TRUE, title = 'PP plot of target PSMs' ,
                   xlab = 'Decoy percentile' ,ylab = 'Target\npercentile'){
   p = ggplot()  +
     geom_abline(slope = pi0,color = 'black') +
@@ -190,6 +244,8 @@ PPplot = function(score, label, pi0 = 0,title = 'PP plot of target PSMs' ,
   if ((length(score[!label]) == 0) | (length(score[label]) == 0))
     return(p + annotate('text',label = 'NOT ENOUGH DATA TO PLOT',x = .5,y = .5))
 
+  if(!score_higher){ score = - score}
+
   Ft = ecdf(score[!label])
   Fd = ecdf(score[label])
   x = score[!label]
@@ -198,24 +254,43 @@ PPplot = function(score, label, pi0 = 0,title = 'PP plot of target PSMs' ,
   p + geom_point(data = df,aes(Fdp,Ftp),color = 'dark grey')
 }
 
-
 #' Plot diagnostic plots to evaluate assumptions from the search all, search subset strategy.
+#'
+#' Four diagnostic plots are created:
+#'\describe{
+#' \item{a}{pi0plot according the number of subset target and decoy PSMs.}
+#' \item{b}{PPplot of the decoy distribution against the subset target distribution.}
+#' \item{c}{PPplot of the decoy distribution against the subset decoy distribution.}
+#' \item{d}{PPplot of the subset decoy distribution against the subset target distribution.}
+#' }
 #'
 #' @param df dataframe with at least 3 columns:
 #'\describe{
 #' \item{score}{score assigned to the peptide to spectrum match (PSM).}
 #' \item{subset}{TRUE if PSM belongs to the subset in interest, FALSE otherwise.}
 #' \item{decoy}{TRUE if decoy PSM, FALSE otherwise.}
+#' @param score_higher TRUE if a higher score means a better PSM.
 #' }
 #'Additional columns are allowed but ignored.
 #' Target and decoy PSMs are assumbed to be from a competitive target decoy database search.
 #'
-#' @return
+#' @return ggplot object.
+#'
 #' @export
 #' @import dplyr
 #' @examples
-plot_diag = function(df){
-  ## TODO add reverse score option
+#'
+#'
+#' ## Simulate a dataset with 140 correct target subset PSMs, 60 incorrect target subset PSMS,
+#' ## 60 decoy subset PSMs and 2000 additional decoy PSMs.
+#' set.seed(10)
+#' d = sample_dataset(H1_n = 140,H0_n = 60, decoy_n = 60 ,decoy_large_n = 2000,
+#'                    H0_mean = 2.7, H1_mean = 3.2, decoy_mean = 2.7, decoy_large_mean = 2.7)
+#' ##pi_0 can be estimated with the target-decoy aproach
+#'
+#' plot_diag(d)
+#'
+plot_diag = function(df, score_higher = TRUE){
     ## remove non subset targets
     df = filter(df, decoy|subset)
 
@@ -224,18 +299,18 @@ plot_diag = function(df){
 
   p1 =  pi0plot(sum(!dfsub$decoy),sum(dfsub$decoy))
 
-  p2 = PPplot(df$score,df$decoy,sum(dfsub$decoy)/sum(!dfsub$decoy),
+  p2 = PPplot(df$score,df$decoy,sum(dfsub$decoy)/sum(!dfsub$decoy),score_higher,
               xlab = 'All decoy percentile')
 
   d = filter(df,decoy)
   d2 = filter(d,subset ) %>%
     mutate(subset = FALSE) ## add subset decoys to rest because it's also part of all decoys'
   d = bind_rows(d,d2)
-  p3 = PPplot(d$score,!d$subset,1,title = 'PP plot of subset decoy PSMs',
+  p3 = PPplot(d$score,!d$subset, 1, score_higher, title = 'PP plot of subset decoy PSMs',
               xlab = 'All decoy percentile',ylab = 'Subset decoy\npercentile')
 
   d = filter(df,subset)
-  p4 = PPplot(d$score,d$decoy, sum(dfsub$decoy)/sum(!dfsub$decoy),
+  p4 = PPplot(d$score,d$decoy, sum(dfsub$decoy)/sum(!dfsub$decoy), score_higher,
               xlab = 'Subset decoy percentile')
 
   p_all = cowplot::plot_grid(p1,p2,p3,p4, align = 'v',labels = 'auto',hjust = -4, label_size = 16)
@@ -247,7 +322,7 @@ plot_diag = function(df){
 
 #' Sample scores for a random dataset
 #'
-#' The scores are sampled from two-component mixture distribution of Gaussians.
+#' The scores are sampled from a two-component mixture distribution of Gaussians.
 #'
 #' @param H0_n number of incorrect subset target PSMs.
 #' @param H1_n number of correct subset target PSMs.
@@ -267,6 +342,31 @@ plot_diag = function(df){
 #' @import dplyr
 #' @keywords internal
 #' @examples
+#'
+#' ## Simulate a dataset with 140 correct target subset PSMs, 60 incorrect target subset PSMS,
+#' ##60 decoy subset PSMs and 2000 additional decoy PSMs.
+#' ## In this first example, incorrect subset target and decoy PSMs have a similar distribution
+#' set.seed(10)
+#' d = sample_dataset(H1_n = 140,H0_n = 60, decoy_n = 60 ,decoy_large_n = 2000,
+#'                    H0_mean = 2.7, H1_mean = 3, decoy_mean = 2.7, decoy_large_mean = 2.7)
+#' # visualize the decoy distribution and the correct and incorrect target distribution
+#' plot(density(d$score[d$decoy]), xlim = c(2,4), xlab = 'score', ylab = 'density')
+#' lines(density(d$score[!d$decoy & d$H0]), col = 'red')
+#' lines(density(d$score[!d$decoy & !d$H0]), col = 'green')
+#' legend('topright', c('decoys', 'incorrect targets', 'correct targets'),
+#'        text.col = c('black', 'red', 'green'))
+#' ## In this first example, incorrect subset target and decoy PSMs have not a similar distribution
+#' ## because the additional set of decoy PSMs are not representative for the incorrect subset PSMs.
+#' set.seed(10)
+#' d = sample_dataset(H1_n = 140,H0_n = 60, decoy_n = 60 ,decoy_large_n = 2000,
+#'                    H0_mean = 2.7, H1_mean = 3, decoy_mean = 2.7, decoy_large_mean = 2.6)
+#' # visualize the decoy distribution and the correct and incorrect target distribution
+#' plot(density(d$score[d$decoy]), xlim = c(2,4), xlab = 'score', ylab = 'density')
+#' lines(density(d$score[!d$decoy & d$H0]), col = 'red')
+#' lines(density(d$score[!d$decoy & !d$H0]), col = 'green')
+#' legend('topright', c('decoys', 'incorrect targets', 'correct targets'),
+#'        text.col = c('black', 'red', 'green'))
+#'
 sample_dataset = function(H1_n = 160,H0_n = 40, decoy_n = H0_n ,decoy_large_n = 2000,
                           H0_mean=2.75, H1_mean=3.31,H0_sd=.13,H1_sd=.28,
                           decoy_mean = H0_mean, decoy_sd = H0_sd,
@@ -300,52 +400,6 @@ sample_dataset = function(H1_n = 160,H0_n = 40, decoy_n = H0_n ,decoy_large_n = 
   bind_rows(d1,d2,d3,d4)
   }
 
-#' plots the theoretical distribution of all components in the PSM distribution
-#' @param H0_mean
-#' @param H1_mean
-#' @param H0_sd
-#' @param H1_sd
-#' @param decoy_mean
-#' @param decoy_sd
-#' @param decoy_large_mean
-#' @param decoy_large_sd
-#' @return
-#' @import dplyr
-#' @import ggplot2
-#' @examples
-plot_theo_dist = function(H0_mean=2.75, H1_mean=3.31,H0_sd=.13,H1_sd=.28,
-                          decoy_mean = H0_mean, decoy_sd = H0_sd,
-                          decoy_extra_mean = H0_mean, decoy_extra_sd = H0_sd){
-
-    ## make grid of scores
-  d = data_frame(score = seq(1,5,.01))
-  ## calculate theoretical density for eacht dist
-
- d = bind_rows(
-    mutate(d,dens = dnorm(score,H1_mean,H1_sd),
-           PSMs = 'correct subset')
-    ,
-    mutate(d,dens = dnorm(score,H0_mean,H0_sd),
-           PSMs = 'incorrect subset')
-    ,
-    mutate(d,dens = dnorm(score,decoy_mean,decoy_sd),
-           PSMs = 'subset decoy')
-    ,
-    mutate(d,dens = dnorm(score,decoy_extra_mean,decoy_extra_sd),
-           PSMs = 'extra decoy')
-  )
-
- d = mutate(d,PSMs = factor(PSMs,levels = unique(d$PSMs)))
-  p1 = ggplot(d,aes(score,dens,col = PSMs,size = PSMs,linetype = PSMs)) + geom_line() +
-    labs(x = 'Score',y = 'Density') +
-    theme(axis.title = element_text(size = rel(1.2)), axis.title.y = element_text(angle = 0),
-          legend.position = 'top') +
-    scale_size_manual(values=c(4,4,1,1))+
-    scale_linetype_manual(values=c(1,1,1,2)) +
-    scale_color_manual(values = c('green','red','orange','blue'))
-  print(p1)
-  list(data = d,plot = p1)
-}
 
 ##' Parses a mzID file generated by MS-GF+.
 ##'
@@ -370,8 +424,18 @@ plot_theo_dist = function(H0_mean=2.75, H1_mean=3.31,H0_sd=.13,H1_sd=.28,
 ##' @import mzR
 ##' @export
 ##' @author
+##' @examples
+##'
+##' ## Location of the zipped data files
+##' zip_file_path = system.file("extdata", "extdata.zip", package = "saas")
+##'
+##' ## Unzip and get the (temporary) location of the mzid file with the MS-GF+ search results from a
+##' ## competitive target decoy search of the complete pyrococcus proteome against a pyrococcus dataset.
+##' mzid_file_path = unzip(zip_file_path, 'pyrococcus.mzid',exdir = tempdir())
+##' ## Parse the mzid file
+##' parse_msgf_mzid(mzid_file_path)
+##'
 parse_msgf_mzid = function(mzid_path){
-## TODO divide number of sequences by 2 (decoys + targets by default)
   if (!requireNamespace("mzR", quietly = TRUE)) {
     stop("Package mzR needed for this function to work. Please install it from bioconductor.",
       call. = FALSE)
@@ -380,7 +444,7 @@ parse_msgf_mzid = function(mzid_path){
   d = openIDfile(mzid_path)
   if (!any(grepl('MS-GF+',mzidInfo(d)$software)))
     stop('Only mzID files generated by MS-GF+ can be parsed')
-  t =  cbind(psms(d),score(d)[,-1]) %>% as_data_frame %>%
+  cbind(psms(d),score(d)[,-1]) %>% as_data_frame %>%
     filter(rank == 1) %>%
     transmute(spec_id = acquisitionNum,
               sequence = as.character(sequence),
@@ -400,6 +464,26 @@ parse_msgf_mzid = function(mzid_path){
 ##' @param fastapath Location of the fasta file.
 ##' @return Logical vector, TRUE if protein id is present in provided fasta file, FALSE otherwise.
 ##' @export
+##' @examples
+##'
+##' ## Location of the zipped data files
+##' zip_file_path = system.file("extdata", "extdata.zip", package = "saas")
+##'
+##' ## Unzip and get the (temporary) location of the mzid file with the MS-GF+ search results from a
+##' ## competitive target decoy search of the complete pyrococcus proteome against a pyrococcus dataset.
+##' mzid_file_path = unzip(zip_file_path, 'pyrococcus.mzid',exdir = tempdir())
+##' ## Parse the mzid file
+##' dat = parse_msgf_mzid(mzid_file_path)
+##'
+##' ## Unzip and get the (temporary) location of the file with fasta headers.
+##' ## Each fasta header contains a protein_id from the protein subset of interest.
+##' ## These protein_ids match the protein_ids in the mzid result file.
+##' fasta_file_path = unzip(zip_file_path, 'transferase_activity_[GO:0016740].fasta', exdir = tempdir())
+##' protein_ids = unique(dat$protein_id)
+##' head(protein_ids)
+##' is_subset = id_is_present(protein_ids, fasta_file_path)
+##' ## Check how many of the identified proteins are subset and non subset protiens.
+##' table(is_subset)
 ##' @author
 id_is_present = function(protein_id,fastapath){
   fas = readr::read_lines(fastapath)
@@ -430,6 +514,30 @@ id_is_present = function(protein_id,fastapath){
 ##' }
 ##'
 ##' Every spectrum haves only 1 row in the data frame.
+##'
+##' @examples
+##'
+##' ## Location of the zipped data files
+##' zip_file_path = system.file("extdata", "extdata.zip", package = "saas")
+##'
+##' ## Unzip and get the (temporary) location of the mzid file with the MS-GF+ search results from a
+##' ## competitive target decoy search of the complete pyrococcus proteome against a pyrococcus dataset.
+##' mzid_file_path = unzip(zip_file_path, 'pyrococcus.mzid',exdir = tempdir())
+##' ## Parse the mzid file
+##' dat = parse_msgf_mzid(mzid_file_path)
+##'
+##' ## Unzip and get the (temporary) location of the file with fasta headers.
+##' ## Each fasta header contains a protein_id from the protein subset of interest.
+##' ## These protein_ids match the protein_ids in the mzid result file.
+##' fasta_file_path = unzip(zip_file_path, 'transferase_activity_[GO:0016740].fasta', exdir = tempdir())
+##'
+##' ## Preprocess the data before FDR estimation.
+##' data_prep = preprocess(dat, is_subset = fasta_file_path)
+##'
+##' ## Estimate the FDR in the subset.
+##' data_result = calculate_fdr(data_prep, score_higher = FALSE)
+##' ## Check how many PSMs are retained at the 1% FDR threshold.
+##' table(data_result$FDR_stable < .01)
 ##'
 ##' @import dplyr
 ##' @export

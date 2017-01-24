@@ -17,4 +17,25 @@ Logical vector, TRUE if protein id is present in provided fasta file, FALSE othe
 \description{
 Checks if protein id appears in the headers of a fasta file.
 }
+\examples{
+
+## Location of the zipped data files
+zip_file_path = system.file("extdata", "extdata.zip", package = "saas")
+
+## Unzip and get the (temporary) location of the mzid file with the MS-GF+ search results from a
+## competitive target decoy search of the complete pyrococcus proteome against a pyrococcus dataset.
+mzid_file_path = unzip(zip_file_path, 'pyrococcus.mzid',exdir = tempdir())
+## Parse the mzid file
+dat = parse_msgf_mzid(mzid_file_path)
+
+## Unzip and get the (temporary) location of the file with fasta headers.
+## Each fasta header contains a protein_id from the protein subset of interest.
+## These protein_ids match the protein_ids in the mzid result file.
+fasta_file_path = unzip(zip_file_path, 'transferase_activity_[GO:0016740].fasta', exdir = tempdir())
+protein_ids = unique(dat$protein_id)
+head(protein_ids)
+is_subset = id_is_present(protein_ids, fasta_file_path)
+## Check how many of the identified proteins are subset and non subset protiens.
+table(is_subset)
+}
 
