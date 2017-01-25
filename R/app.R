@@ -70,7 +70,6 @@ plot_theo_dist = function(H0_mean=2.75, H1_mean=3.31,H0_sd=.13,H1_sd=.28,
   list(data = d,plot = p1)
 }
 
-
 ##' server
 ##'
 ##' @param input
@@ -203,7 +202,8 @@ output$plot_theo = renderPlot({
 ##' @return
 ##' @author
 ##' @keywords internal
-ui = function() fluidPage(navbarPage(
+ui = function() fluidPage(
+                 navbarPage(
   "Search All, Assess Subset",
   tabPanel('Data input',
            sidebarLayout(
@@ -229,6 +229,7 @@ step **2.** and **3.**'
                                                 'text/comma-separated-values,text/plain',
                                                 '.csv')
                           ),
+                          actionButton("action", label = "Load example data"),
                           checkboxInput("scorehigher", "Are higher scores better?", TRUE),
                           HTML(markdownToHTML(text =
                                                 '
@@ -257,10 +258,7 @@ id,score,decoy,subset
 The minimal required input are PSMs from subset targets and decoys (row 2 and 4 in example input).
 Additional decoy PSMs (row 1) are used for a more stable FDR calculation.
 Non subset targets (row 3) are ignored in the analysis.
-
-**Load an example dataset:**
-')),
-                          actionButton("action", label = "Load example")
+'))
              ),
              mainPanel(width = 5,h3(textOutput('errormessage',container = span)),
                        tags$textarea(id = 'rawinput',label = '',
@@ -296,16 +294,19 @@ Download the results to your computer:
   tabPanel('Check diagnostic plots',
            sidebarLayout(
              sidebarPanel(width = 12,
-                          HTML(markdownToHTML(text =  '
-These are diagnostic plots to evaluate the quality of the decoy set and the estimation of the fraction of incorrect target PSMs (pi0).
-This allows an informed choice on the use of the stable all-sub FDR estimator and the large decoy set.
+                          fluidRow(column(width = 10, HTML(markdownToHTML(text =  '
+These are diagnostic plots to evaluate the quality of the decoy set and the uncertainty in the estimated fraction of incorrect target PSMs (pi0).
+This allows an informed choice on the use of the stable all-sub FDR estimator and the large decoy set.'))),
 
+column(width = 2, checkboxInput("diag_more_info", label = "More info")),
+column(width = 12, conditionalPanel(condition = "input.diag_more_info == true",
+                        HTML(markdownToHTML(text =  '
 **Panel a** shows the posterior distribution of pi_0 given the observed number of target and decoy PSMs in the subset.
-The vertical line indicates our conservative estimation of pi_0 used in the calculations.
+The vertical line indicates the conservative pi_0 estimate used in the calculations.
 At very high pi_0 uncertainty (broad peak), you can opt to use the BH procedure to minimize sample to sample variability.
 However, this will come at the expense of too conservative PSM lists.
 
-Our improved TDA for subsets relies on the assumption that incorrect subset PSMs and the complete set of decoys are following the same distribution.
+Our improved TDA for subsets relies on the assumption that incorrect subset PSMs and the complete set of decoys have the same distribution.
 This distributional assumption can be verified through a PP-plot where the empirical Cumulative Distribution Function (eCDF) of the decoys is plotted against the eCDF of the subset target PSMs.
 The PP-plots in **panel b - d** display the target subset PSMs plotted against all decoy PSMs from the complete search, the decoy subset PSMs plotted against all decoy PSMs from the complete search, and the target subset PSMs plotted against the decoy PSMs from the complete search, respectively.
 The full line in panel **b** and **d** indicates a line with a slope of pi_0.
@@ -322,23 +323,26 @@ The profile should look as described for panel **b**.
 If the profile matches in panel **d** but does not for panel **b**, then we suggest to not use the extra decoy set and use only the subset decoys for FDR estimation.
 
 When you are not sure how the diagnostic plots should look like, you can simulate your own data under various (erratic) settings in the simulation tab.
-'))
-             ),
-              mainPanel(width = 12,plotOutput('plot1'))
-           ))
+'))))))
+             ,
+              mainPanel(width = 12,plotOutput('plot1')
+           )))
 ,
 tabPanel('simulation',
          sidebarLayout(
            sidebarPanel(width = 12,
+                        fluidRow(column(width = 10,HTML(markdownToHTML(text =  '
+In this tab, you can simulate your own data and look at examples of diagnostic plots.'))),
+column(width = 2, checkboxInput("simulation_more_info", label = "More info")),
+column(width = 12, conditionalPanel(condition = "input.simulation_more_info == true",
                         HTML(markdownToHTML(text =  '
-In this tab, you can simulate your own data and look at examples of diagnostic plots.
 Random datasets are generated based on a observed number of target and decoy subset PSMs.
 Optionally, you can also generate a random number of subset decoy PSMs based on the observed number of subset target PSMs and a theoretic pi0 that you can choose.
 In the default setting is the decoy distribution equal to the incorrect subset target distribution.
 This means that the diagnostic plots from the simulated datasets are exemplary for experimental settings where the assumptions are grounded and you can safely use the decoys for FDR estimation.
 Optionally, you can change the mean and standard deviation of the subset decoys and/or the large set of extra decoys, violating the assumption that they are representative for the incorrect subset targets.
 Plots generated by these simulated datasets are examples of diagnostic plots when the assumptions are violated an you should not use these decoys for FDR estimation.
-')))
+'))))))
 ,
 mainPanel(width = 12,
           column(6,
