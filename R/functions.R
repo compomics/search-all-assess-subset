@@ -407,6 +407,8 @@ sample_dataset = function(H1_n = 160,H0_n = 40, decoy_n = H0_n ,decoy_large_n = 
 ##' for more info on how to perform a database search on MSMS dataset with MS-GF+ and how to generate a mzID file.
 ##' Note that most functions in these package require data from a competitive target decoy search.
 ##'
+##' We take the MS-GF+ SpecEValue as the PSM score for FDR calculation.
+##'
 ##' @param mzid_path Location of the mzID file.
 ##'
 #' @return A data frame containing the following 7 columns:
@@ -449,7 +451,10 @@ parse_msgf_mzid = function(mzid_path){
     transmute(spec_id = acquisitionNum,
               sequence = as.character(sequence),
               protein_id = as.character(DatabaseAccess),
-              protein_id = str_replace(protein_id, '(XXX_)',''), ##remove XXX_ in decoy protein
+              ## Protein id from decoys should match the protein id from their decoy equivalent.
+              ## because you should be able identify the subset proteins
+              ## In case of MSGF+, the means to remove 'XXX_' in the protein_id
+              protein_id = str_replace(protein_id, '(XXX_)',''),
               score= MS.GF.SpecEValue,
               database = gsub(".*/+([^/]+).fasta","\\1",levels(database(d)[['location']])),
               decoy = isDecoy,
@@ -472,7 +477,7 @@ parse_msgf_mzid = function(mzid_path){
 ##' ## Unzip and get the (temporary) location of the mzid file with the MS-GF+ search results from a
 ##' ## competitive target decoy search of the complete pyrococcus proteome against a pyrococcus dataset.
 ##' mzid_file_path = unzip(zip_file_path, 'pyrococcus.mzid',exdir = tempdir())
-##' ## Parse the mzid file
+##' ## Read and parse the mzid file
 ##' dat = parse_msgf_mzid(mzid_file_path)
 ##'
 ##' ## Unzip and get the (temporary) location of the file with fasta headers.
@@ -523,8 +528,8 @@ id_is_present = function(protein_id,fastapath){
 ##' ## Unzip and get the (temporary) location of the mzid file with the MS-GF+ search results from a
 ##' ## competitive target decoy search of the complete pyrococcus proteome against a pyrococcus dataset.
 ##' mzid_file_path = unzip(zip_file_path, 'pyrococcus.mzid',exdir = tempdir())
-##' ## Parse the mzid file
-##' dat = parse_msgf_mzid(mzid_file_path)
+##' ## Read and parse the mzid file
+##' data = parse_msgf_mzid(mzid_file_path)
 ##'
 ##' ## Unzip and get the (temporary) location of the file with fasta headers.
 ##' ## Each fasta header contains a protein_id from the protein subset of interest.
@@ -532,7 +537,7 @@ id_is_present = function(protein_id,fastapath){
 ##' fasta_file_path = unzip(zip_file_path, 'transferase_activity_[GO:0016740].fasta', exdir = tempdir())
 ##'
 ##' ## Preprocess the data before FDR estimation.
-##' data_prep = preprocess(dat, is_subset = fasta_file_path)
+##' data_prep = preprocess(data, is_subset = fasta_file_path)
 ##'
 ##' ## Estimate the FDR in the subset.
 ##' data_result = calculate_fdr(data_prep, score_higher = FALSE)

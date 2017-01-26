@@ -216,8 +216,8 @@ of the identified PSMs from a shotgun proteomics experiment.
 
 The workflow is as follows:
 
-1. search the spectra for all expected peptides
-2. Removing irrelevant peptides
+1. search spectra against all expected proteins
+2. Remove PSMs from irrelevant proteins
 3. Calculate FDR
 
 You can load the data from step **1.** into this webtool to perform
@@ -311,10 +311,10 @@ This distributional assumption can be verified through a PP-plot where the empir
 The PP-plots in **panel b - d** display the target subset PSMs plotted against all decoy PSMs from the complete search, the decoy subset PSMs plotted against all decoy PSMs from the complete search, and the target subset PSMs plotted against the decoy PSMs from the complete search, respectively.
 The full line in panel **b** and **d** indicates a line with a slope of pi_0.
 The full line in panel **c** indicates the identity line.
-The first part of the plot in **a** and **b** is linear with a slope that equals pi_0.
-This indicates that the decoy distribution and the mixture component for incorrect PSMs of the target mixture distribution coincide.
-The second part of the plot deviates from the line towards higher percentiles and will ultimately become vertical (decoy percentile = 1).
-If we see this profile in panel **a**, we have a good indication that the set of decoys from the complete search is representative for the mixture component for incorrect PSMs of the target mixture distribution.
+The first part of the plot in **a** and **b** should be linear with a slope that equals pi_0.
+The second part of the plot will deviate from this line towards higher percentiles and will ultimately become vertical (decoy percentile = 1).
+If we see this profile in panel **b**, we have a good indication that the set of decoys from the complete search is representative for the mixture component for incorrect PSMs of the target mixture distribution.
+When there is high uncertainty on pi_0 as indicated by **a**, then the linear pattern in the data points might deviate from the drawn solid line, but should still be more or less linear.
 Deviations from this pattern might be subtle, therefore we provide the PP plots in **c** and **d** to support the conclusion drawn from panel **b**.
 The PP-plot in panel **c**  shows the subset decoy PSMs plotted against all decoy PSMs.
 The whole plot should follow the identity line, indicating that the complete set of decoys is a good representation of the subset decoys.

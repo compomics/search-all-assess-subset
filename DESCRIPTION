@@ -17,5 +17,8 @@ Imports:
     cowplot (>= 0.7.0),
     markdown (>= 0.7.0)
 Suggests:
-    mzR (>= 2.8.0)
+    mzR (>= 2.8.0),
+    knitr,
+    rmarkdown
 RoxygenNote: 5.0.1
+VignetteBuilder: knitr
