@@ -270,26 +270,33 @@ Non subset targets (row 3) are ignored in the analysis.
   tabPanel('Calculate FDR',
            sidebarLayout(
              sidebarPanel(width = 12,
+                          fluidRow(column(width = 10, HTML(markdownToHTML(text =  '
+Download the results to your computer:
+'))),
+column(width = 2, checkboxInput("res_more_info", label = "More info")),
+downloadButton('downloadData', 'Download'),
+column(width = 12, conditionalPanel(condition = "input.res_more_info == true",
                           withMathJax(),
                            HTML(markdownToHTML(text =
 'The following columns were calculated:
-* **pi_0_cons**: A conservative estimation of pi_0. (pi_0_cons = (#decoys+1) / (#targets+1})
+* **pi_0_cons**: A conservative estimation of $\\pi_0$. (pi_0_cons = (#decoys+1) / (#targets+1})
 * **FDR**: The estimated FDR at this score cutoff for subset PSMs.
+Calculated according the classical TDA method. Does not work well small subsets.
 Missing for non-subset or decoy PSMs.
 * **FDR_stable**: The estimated stable FDR at this score cutoff for subset PSMs.
-This FDR is estimated from the complete decoy set and pi_0_cons.
+This FDR is estimated from the complete decoy set and *pi_0_cons*.
+This method is more stable for smaller subsets and will for large subset be close to the **FDR** estimates.
 Missing for non-subset or decoy PSMs.
 Please check the diagnostics on the next tab.
 * **FDR_BH**: The estimated stable FDR at this score cutoff for subset PSMs.
-This FDR is estimated from the complete decoy set and according the Benjamini-Hochberg FDR procedure.
+This FDR is estimated from the complete decoy set and according the Benjamini-Hochberg FDR procedure ($\\pi_0$ set to 1).
+This FDR estimate is more conservative then **FDR** and **FDR_BH**.
+Use this method when you have a large decoy set but no decoy information on the subset PSMs (eg. when the search engine does not return the decoy protein ids).
 Please check the diagnostics on the next tab.
 Missing for non-subset or decoy PSMs.
+')))))),
 
-Download the results to your computer:
-')),
-                          downloadButton('downloadData', 'Download')),
-
-             mainPanel(width = 12,dataTableOutput('contents'))
+mainPanel(width = 12,dataTableOutput('contents'))
            )),
   tabPanel('Check diagnostic plots',
            sidebarLayout(
@@ -311,7 +318,7 @@ This distributional assumption can be verified through a PP-plot where the empir
 The PP-plots in **panel b - d** display the target subset PSMs plotted against all decoy PSMs from the complete search, the decoy subset PSMs plotted against all decoy PSMs from the complete search, and the target subset PSMs plotted against the decoy PSMs from the complete search, respectively.
 The full line in panel **b** and **d** indicates a line with a slope of pi_0.
 The full line in panel **c** indicates the identity line.
-The first part of the plot in **a** and **b** should be linear with a slope that equals pi_0.
+The first part of the plot in **b** and **d** should be linear with a slope that equals pi_0.
 The second part of the plot will deviate from this line towards higher percentiles and will ultimately become vertical (decoy percentile = 1).
 If we see this profile in panel **b**, we have a good indication that the set of decoys from the complete search is representative for the mixture component for incorrect PSMs of the target mixture distribution.
 When there is high uncertainty on pi_0 as indicated by **a**, then the linear pattern in the data points might deviate from the drawn solid line, but should still be more or less linear.
