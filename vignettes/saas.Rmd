@@ -1,0 +1,154 @@
+---
+title: "SAAS: Search All, Assess Subset"
+author: "Adriaan Sticker"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+  fig_caption: yes
+#  pdf_document: default
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+In this vignette we will demonstrate how to use the 'search all, asses subset' strategy (all-sub) to correctly calculated the FDR on a PSM subset of interest in a shotgun proteomic experiment.
+
+In short, the basic all-sub workflow comprises the following steps:
+
+1. Search the experimental MS2 spectra against all proteins potentially present in the sample.
+1. Remove all PSMs that match a protein you are not interesed in.
+1. Calculate the FDR on the resulting subset of PSMs.
+
+## The data
+In this vignette we use data from a *Pyrocococus furiosis* sample run on a LTQ-Orbitrap Velos mass spectrometer. The data can be found in the PRIDE repository with indentifier PXD001077.
+The *Pyrocococus furiosis* reference proteome fasta file was downloaded from Uniprot on April 22, 2016.
+In this use case we are interested in *Pyrococcus* proteins related to transferase activity as defined by their Gene Ontology identifier (GO:0016740). A fasta file with these proteins was also downloaded from Uniprot. 
+
+## Database search
+In theory, the all-sub method can be used on the results from any search engine that report peptide spectrum matches (PSMs) with a score. However, this R package only provides a parser for the MS-GF+ MZident output files. Output from other search engines should be parsed and presented in the format of the output from the 'parse_msgf_mzid()' function (see 'help(saas::parse_msgf_mzid)'in R).
+It should be realtively straightforward to adapt the code from 'parse_msgf_mzid()' to work with other search engines.
+It's very important that searches are run on a concatenated target-decoy database.
+
+The *Pyrococcus* dataset was searched against all *Pyrococcus* proteins with the MS-GF+ Search engine (v2016.10.26).
+The MS-GF+ parameter settings used are:
+```
+ -t 10ppm -ti 0,1 -tda 1 -m 3 -inst 1 -e 1 -protocol 0 -ntt 2 -minLength 6 -maxLength 30 
+ -minCharge 2 -maxCharge 4 -n 1
+```
+The modification file provide to MS-GF+ is:
+```
+NumMods=2
+
+57.021464,C,fix,any,Carbamidomethyl
+15.994915,M,opt,any,Oxidation
+H1O3P1,STY,opt,any,Phospho
+
+```
+
+For an explanation on how to use MS-GF+ and an explanation on all parameter settings, please read the MS-GF+ documentation at:
+
+https://omics.pnl.gov/software/ms-gf
+
+The MS-GF+ MZident output file from this search is included in this package for use in subsequent analysis steps.
+
+## Reading a MS-GF+ MZident output file.
+```{r, cache= TRUE}
+## Load the saas library
+library(saas)
+## Load some convenience functions
+library(dplyr, quietly = TRUE, warn.conflicts = FALSE) 
+
+## Location of the zipped data files
+zip_file_path = system.file("extdata", "extdata.zip", package = "saas")
+## Unzip and get the (temporary) location of the mzid file with the MS-GF+ search results.
+mzid_file_path = unzip(zip_file_path, 'pyrococcus.mzid',exdir = tempdir())
+
+## Read and parse the mzid file
+data = parse_msgf_mzid(mzid_file_path)
+
+glimpse(data)
+```
+## Preprocessing the MS-GF+ search results.
+By default, the 'preprocess()' function removes all PSMs that assigned to both a decoy and target sequence.
+All rows in the dataframe that belong to the same PSMs (eg. one PSMs that match multiple proteins) are collapsed into one row. 
+
+When a path to a fasta file with the protein_ids from a subset of proteins in the fasta headers is provided, a new column is added that indicates if this PSM belongs to this subset of interest. These protein_ids should match the protein_ids from orginal fasta file used in the MS-GF+ search (and as indicated in the protein_id column in the data frame). This information is needed to use the all-sub method.
+
+Optionally, it's also possible to remove PSM's that can be assigned to multiple proteins.
+```{r, cache= TRUE}
+## Unzip and get the (temporary) location of the file with fasta headers containing 
+## the protein_ids from the protein subset of interest.
+fasta_file_path = unzip(zip_file_path, 'transferase_activity_[GO:0016740].fasta', exdir = tempdir())
+
+## Preprocess the data.
+data_prep = preprocess(data, is_subset = fasta_file_path)
+
+glimpse(data_prep)
+```
+## Evaluating the decoy PSM distribution.
+The implementation of the all-sub in this packages adopt the target-decoy approach for FDR estimation.
+A subset FDR can be obtained by applying TDA on the subset target and decoy PSMs.
+
+However, in very small subsets with little subset target and decoy PSMs, there can be a large sample-to-sample variability on the FDR estimates. We provide extensions to the basic subset TDA FDR to obtain more stable FDR estimates. Key is the use of a large set of decoy PSMs to reliable estimate the distribution of incorrect target PSM scores. By default we use all decoys from the complete search (subset and non-subset PSMs). 
+
+Bot the classical TDA FDR and our more stable TDA FDR relie on the assumption that the distribution of incorrect target PSM scores can be approximated by the decoy PSM score distribution.
+
+In this package we provide diagnostic plots to verify the assumption that the decoy PSM score distribution follows the incorrect target PSM distribution.
+Tthe 'score_higher' parameter in 'plot_diag()' indicates if higher score values mean a more confident PSM.
+We take the MS-GF+ SpecEValue as the PSM score for FDR calculation and smaller SpecEValue indicate a better match.
+Therefore we have to set the 'score_higher' parameter to 'FALSE'.
+
+```{r, cache= TRUE,fig.width=10, fig.height= 6, out.width= 700}
+diagnostics = plot_diag(data_prep, score_higher = FALSE)
+diagnostics$all
+```
+**Panel a** shows the posterior distribution of pi_0 given the observed number of target and decoy PSMs in the subset.
+The vertical line indicates the conservative pi_0 estimate used in the calculations.
+At very high pi_0 uncertainty (broad peak), you can also opt to use the BH procedure to minimize sample to sample variability which would mean that pi_0 would be set to 1.
+However, this will come at the expense of too conservative PSM lists.
+
+The distributional assumption for the decoys can be verified through a PP-plot where the empirical Cumulative Distribution Function (eCDF) of the decoys is plotted against the eCDF of the subset target PSMs.
+The PP-plots in **panel b - d** display the target subset PSMs plotted against all decoy PSMs from the complete search, the decoy subset PSMs plotted against all decoy PSMs from the complete search, and the target subset PSMs plotted against the decoy PSMs from the complete search, respectively.
+The full line in panel **b** and **d** indicates a line with a slope of pi_0.
+The full line in panel **c** indicates the identity line.
+When the distributional assumption holds then the first part of the plot in **b** and **d** should be linear with a slope that equals pi_0.
+The second part of the plot deviates from the line towards higher percentiles and will ultimately become vertical (decoy percentile = 1).
+If we see this profile in panel **b**, we have a good indication that the set of decoys from the complete search is representative for the mixture component for incorrect PSMs of the target mixture distribution.
+Deviations from this pattern might be subtle, therefore we provide the PP plots in **c** and **d** to support the conclusion drawn from panel **b**.
+When there is high uncertainty on pi_0 as indicated by **a**, then the linear pattern in the data points might deviate from the drawn solid line, but should still be more or less linear.
+The PP-plot in panel **c**  shows the subset decoy PSMs plotted against all decoy PSMs.
+The whole plot should follow the identity line, indicating that the complete set of decoys is a good representation of the subset decoys.
+To verify that the subset decoys (and thus also the complete set of decoys) are representative for the mixture component for incorrect PSMs of the target mixture distribution, we look at the PP-plot of the subset decoys against the subset targets in panel **d**.
+The profile should look as described for panel **b**.
+If the profile matches in panel **d** but does not for panel **b**, then we suggest to not use the extra decoy set and use only the subset decoys for FDR estimation.
+
+We can conclude from the above diagnostic plots that the large decoy set is an appropiate candiate set to estimate the incorrect subset target PSM distribution.
+
+## Estimating FDR on the subset of interest.
+The output from 'preprocess()' can be immediatly used to estimate the FDR in the PSM subset of interest.
+
+```{r, cache= TRUE}
+data_results = calculate_fdr(data_prep, score_higher = FALSE)
+glimpse(data_results)
+```
+We can choose in the output from three different all-sub FDR estimations:
+The estimated stable FDR at this score cutoff for subset PSMs.
+1. FDR: Calculated according the classical TDA method. Does not work well small subsets.
+1. FDR_stable: Our improved FDR method which is more stable in small subsets. For large subsets, *FDR_stable* estimates will be close to **FDR** estimates.
+1. FDR_BH: Use this when you have a large decoy set but no decoy information on the subset PSMs (eg. the search engine does not return decoy protien ids). This FDR estimate is more conservative then **FDR** and **FDR_BH**.
+
+The 'transferase activity' subset is rather small with 104 target and 37 decoy PSMs.
+```{r, cache= TRUE}
+count(data_results, subset, decoy)
+```
+
+From the diagnostic plots we concluded that the set of decoy PSMs from the complete search is a good candidate set to approximate the incorrect target PSM distribution.
+
+So, in this case it's recommended to use the more stable FDR estimates in **FDR_stable**.
+
+```{r, cache= TRUE}
+results_1_FDR = filter(data_results, subset, !decoy, FDR_stable >= .01) 
+glimpse(results_1_FDR)
+```
+At 1\% FDR, we return 31 PSMs.
