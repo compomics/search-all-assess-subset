@@ -140,16 +140,16 @@ calculate_fdr = function(df,score_higher = TRUE) {
     #   (sum(decoy[subset == 1] != 1)),
     ## conservative pi_0 of subset PSMs with upperbound of 1
     pi_0_cons = (sum(decoy[subset]) + 1) /
-      (sum(!decoy[subset]) + 1),
+      (sum(!decoy[subset])),
     pi_0_cons = ifelse(pi_0_cons > 1, 1, pi_0_cons)
   ) %>%
     # Sort the score depending on if higher scores are better or not
     arrange(desc(if (score_higher) score else -score)) %>%
     # Calculate classical FDR on subset
     mutate(FDR = cumsum(decoy & subset) /
-             cumsum(!decoy & subset)) %>%
+             cumsum(!decoy & subset),
     # calculate BH FDR on subset
-    mutate(FDR_BH = (cumsum(decoy) / sum(decoy)) /
+    FDR_BH = (cumsum(decoy) / sum(decoy)) /
              (cumsum(!decoy & subset) / sum(!decoy & subset))) %>%
     ## Assure FDRs are monotonic
     mutate_at(vars(FDR, FDR_BH),
