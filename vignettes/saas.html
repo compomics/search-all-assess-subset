@@ -12,7 +12,7 @@
 
 <meta name="author" content="Adriaan Sticker" />
 
-<meta name="date" content="2017-01-29" />
+<meta name="date" content="2017-02-01" />
 
 <title>SAAS: Search All, Assess Subset</title>
 
@@ -70,10 +70,30 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">SAAS: Search All, Assess Subset</h1>
 <h4 class="author"><em>Adriaan Sticker</em></h4>
-<h4 class="date"><em>2017-01-29</em></h4>
+<h4 class="date"><em>2017-02-01</em></h4>
 
 
+<div id="TOC">
+<ul>
+<li><a href="#introduction"><span class="toc-section-number">1</span> Introduction</a><ul>
+<li><a href="#false-discovery-rate-fdr-estimation"><span class="toc-section-number">1.1</span> False discovery rate (FDR) estimation</a></li>
+<li><a href="#target-decoy-approach"><span class="toc-section-number">1.2</span> Target-decoy approach</a></li>
+<li><a href="#stable-target-decoy-approach-for-subsets"><span class="toc-section-number">1.3</span> Stable target-decoy approach for subsets</a></li>
+</ul></li>
+<li><a href="#example-data-analysis"><span class="toc-section-number">2</span> Example data analysis</a><ul>
+<li><a href="#the-data"><span class="toc-section-number">2.1</span> The data</a></li>
+<li><a href="#database-search"><span class="toc-section-number">2.2</span> Database search</a></li>
+<li><a href="#reading-a-ms-gf-mzident-output-file."><span class="toc-section-number">2.3</span> Reading a MS-GF+ MZident output file.</a></li>
+<li><a href="#preprocessing-the-ms-gf-search-results."><span class="toc-section-number">2.4</span> Preprocessing the MS-GF+ search results.</a></li>
+<li><a href="#evaluating-the-decoy-psm-distribution."><span class="toc-section-number">2.5</span> Evaluating the decoy PSM distribution.</a></li>
+<li><a href="#estimating-fdr-on-the-subset-of-interest."><span class="toc-section-number">2.6</span> Estimating FDR on the subset of interest.</a></li>
+<li><a href="#sessioninfo"><span class="toc-section-number">2.7</span> sessionInfo()</a></li>
+</ul></li>
+</ul>
+</div>
 
+<div id="introduction" class="section level1">
+<h1><span class="header-section-number">1</span> Introduction</h1>
 <p>In this vignette we will demonstrate how to use the ‘search all, asses subset’ strategy (all-sub) to correctly calculated the FDR on a PSM subset of interest in a shotgun proteomic experiment.</p>
 <p>In short, the basic all-sub workflow comprises the following steps:</p>
 <ol style="list-style-type: decimal">
@@ -81,12 +101,79 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>Remove all PSMs that match a protein you are not interesed in.</li>
 <li>Calculate the FDR on the resulting subset of PSMs.</li>
 </ol>
-<div id="calculate-the-fdr" class="section level2">
-<h2>Calculate the FDR</h2>
-<p>The most common method for FDR calculation is the ## The data In this vignette we use data from a <em>Pyrocococus furiosis</em> sample run on a LTQ-Orbitrap Velos mass spectrometer. The data can be found in the PRIDE repository with indentifier PXD001077. The <em>Pyrocococus furiosis</em> reference proteome fasta file was downloaded from Uniprot on April 22, 2016. In this use case we are interested in <em>Pyrococcus</em> proteins related to transferase activity as defined by their Gene Ontology identifier (<a href="GO:0016740" class="uri">GO:0016740</a>). A fasta file with these proteins was also downloaded from Uniprot.</p>
+<div id="false-discovery-rate-fdr-estimation" class="section level2">
+<h2><span class="header-section-number">1.1</span> False discovery rate (FDR) estimation</h2>
+Let <span class="math inline">\(x\)</span> be the PSM score and assume that larger score values indicate a better match to the theoretical spectrum, e.g. in case the MS-GF+ score defined in Section . The FDR is known to have a Bayesian interpretation upon defining a mixture model for the distribution of <span class="math inline">\(x\)</span> <span class="citation">(Efron 2008)</span>.
+<span class="math display">\[\begin{equation}
+f(x) = \pi_0 f_0(x) + (1-\pi_0) f_1(x),
+\end{equation}\]</span>
+<p>with <span class="math inline">\(f(x)\)</span> the target distribution of the test statistic, <span class="math inline">\(f_0(x)\)</span> the mixture component corresponding to incorrect PSMs, <span class="math inline">\(f_1(x)\)</span> the mixture component corresponding to the correct PSMs and <span class="math inline">\(\pi_0\)</span> the fraction of incorrect PSMs.</p>
+Based on the mixture distribution the FDR can be defined as the posterior probability
+<span class="math display">\[\begin{equation}
+\text{FDR}(x) = Pr[\text{PSM is incorrect}\vert X\geq x].
+\end{equation}\]</span>
+Let <span class="math inline">\(F(x)\)</span>, <span class="math inline">\(F_0(x)\)</span> and <span class="math inline">\(F_1(x)\)</span> indicate the complementary cumulative distribution function (CCDF)
+<span class="math display">\[\begin{equation}
+F_{.}(x)=\int\limits_{X=x}^{+\infty} f_{.}(X) dx
+\end{equation}\]</span>
+so
+<span class="math display">\[\begin{equation}
+F(x)= \pi_0 F_0(x) + (1-\pi_0) F_1(x)
+\end{equation}\]</span>
+and the FDR becomes
+<span class="math display">\[\begin{equation}
+\text{FDR}(x)=\frac{\pi_0 F_0(x) }{F(x)}
+\end{equation}\]</span>
+<p>The empirical Bayes/two-groups approach also has the great virtue that independence of the scores is not necessary as long as (1) the estimated CCDF of the marginal distribution is roughly unbiased and (2) the null component is estimated empirically <span class="citation">(Efron 2008)</span>.</p>
+</div>
+<div id="target-decoy-approach" class="section level2">
+<h2><span class="header-section-number">1.2</span> Target-decoy approach</h2>
+<p>In a competitive target decoy search, FDRs are estimated by dividing the number of accepted decoys PSMs by the number of accepted target PSMs at a certain MS-GF+ score cutoff <span class="citation">(Elias and Gygi 2007)</span>. For FDR estimation in the subset of interest, use only target and decoy PSMs belonging to the subset in the calculation. We assure a monotonic increase of FDR estimates with decreasing score values by replacing the FDR at a particular score <span class="math inline">\(x\)</span> by the maximum TDA FDR in the interval <span class="math inline">\([x,+\infty]\)</span>.</p>
+Note, that in a competitive target decoy search the FDR with TDA is estimated by
+<span class="math display">\[\begin{equation}
+\widehat{\text{FDR}}(x) =\frac{\# decoys | X\geq x}{\# targets | X\geq x},
+\end{equation}\]</span>
+which can be rewritten as 
+<span class="math display">\[\begin{eqnarray*}
+\widehat{\text{FDR}}(x) &amp;=&amp;\frac{\frac{\#decoys}{\#targets}\frac{\# decoys | X\geq x}{\# decoys}}{\frac{\# targets | X\geq x}{\# targets}}\\
+&amp;=&amp;\frac{\hat \pi_0 \bar F_0(x)}{\bar F(x)}
+\end{eqnarray*}\]</span>
+with <span class="math inline">\(\bar F_0(x)\)</span> and <span class="math inline">\(\bar F(x)\)</span> the empirical complementary cumulative distribution functions (ECCDFs) estimated using decoy and target PSMs, respectively. So, in a competitive TDA the FDR implicitly relies on the estimator of the proportion of incorrect PSMs among the targets
+<span class="math display">\[\begin{equation} \hat \pi_0=\frac{\#decoys}{\#targets}.
+\end{equation}\]</span>
+</div>
+<div id="stable-target-decoy-approach-for-subsets" class="section level2">
+<h2><span class="header-section-number">1.3</span> Stable target-decoy approach for subsets</h2>
+<p>In small subsets we typically can expect a low number of decoy PSMs and the <span class="math inline">\(\bar F_0(x)\)</span> will be a poor estimator of <span class="math inline">\(F_0(x)\)</span>. For improving the stability of the target-decoy approach in small subsets we propose to estimate the mixture component for incorrect PSMs using a large set of decoys with similar properties as the incorrect subset PSMs. Hence, the method only relies on the assumption that the incorrect target PSM scores follow the same distribution as the PSM scores of the decoy set.</p>
+<p>In many cases, the set of decoys in the complete search seems a good candidate set. This allows for the estimation of the mixture component of the incorrect PSMs and the marginal distribution of all PSMs non-parametrically, i.e. based on the ECCDFs <span class="math inline">\(\bar F_0(x)\)</span> using a large decoy set (e.g. of the complete search) and <span class="math inline">\(\bar F(x)\)</span> derived from the targets in the subset, respectively.</p>
+The mixture proportion <span class="math inline">\(\pi_0\)</span> can still be estimated based on the ratio of the number of decoys on the number of targets in the subset upon a competitive target decoy search. However, the estimator <span class="math inline">\(\hat \pi_0\)</span> often becomes zero in very small subsets, inducing an FDR estimate of zero for the set of all subset target PSMs. We therefore propose to use the estimator
+<span class="math display">\[\begin{equation}
+    \hat \pi_0=
+\begin{cases}
+  \frac{\#\text{decoys}_\text{subset}+1}{\#\text{targets}_\text{subset}}, &amp;
+  \text{if}\ \#\text{targets} &gt; \#\text{decoys}\\
+  1, &amp;
+  \text{if}\ \#\text{targets} \leq \#\text{decoys}\\
+\end{cases}
+  ,
+\end{equation}\]</span>
+<p>which has a lower bound of <span class="math inline">\(\frac{1}{\text{targets}_\text{subset}}\)</span> and an upper bound of 1. Note that this estimator has an upward bias in small subsets, which disappears for moderate to large subsets. In the extreme case that we observe only one target PSM, <span class="math inline">\(\hat \pi_0\)</span> is 1 and the FDR estimator reduces to a regular p-value.</p>
+<p>Note, that a conservative estimator of the FDR is also available using the link between the Bayesian and the Benjamini-Hochberg (BH) FDR procedure, i.e. by setting the mixture proportion of the mixture component for incorrect PSMs to <span class="math inline">\(\pi_0=1\)</span> <span class="citation">(Efron 2008)</span>.</p>
+<span class="math display">\[\begin{equation}
+\widehat{\text{FDR}}(x)=\frac{\bar F_0(x)}{\bar F(x)}.
+\end{equation}\]</span>
+<p>In very small subsets, the latter FDR estimator is still valid as long as a good estimator of the mixture component for incorrect PSMs is available. Benjamini and Hochberg, 1995, for instance, included an example with 15 comparisons in their seminal paper <span class="citation">(Benjamini and Hochberg 1995)</span>. Also note that their FDR estimator also reduces to a regular p-value in the extreme case that the subset of interest consists of one target PSM, i.e. we set <span class="math inline">\(\pi_0=1\)</span> and <span class="math inline">\(\bar F=1\)</span> for this extreme edge case.</p>
+<p>The ECCDF <span class="math inline">\(\bar F_0(x)\)</span> will be zero for every target PSM with a score higher then the maximum decoy PSM score, inducing a FDR estimate of zero for these target PSMs. Decreasing the total number of decoys will lower the maximum decoy PSM score and thus lower the threshold at which the estimated FDR of the target PSMs will be zero. This means when only few decoys PSMs are observed, FDR estimates have high sample-to-sample variability and are biased to lower values.  FDR estimates are too liberal and underestimates the true FDR. Therefore we recommend to have at least 1000 decoys to obtain sufficiently reliable FDR estimates in most situations. Lastly, we assure a monotonic increase of FDR estimates with decreasing score values by replacing the FDR at a particular score <span class="math inline">\(x\)</span> by the maximum TDA FDR in the interval <span class="math inline">\([x,+\infty]\)</span>.</p>
+</div>
+</div>
+<div id="example-data-analysis" class="section level1">
+<h1><span class="header-section-number">2</span> Example data analysis</h1>
+<div id="the-data" class="section level2">
+<h2><span class="header-section-number">2.1</span> The data</h2>
+<p>In this vignette we use data from a <em>Pyrocococus furiosis</em> sample run on a LTQ-Orbitrap Velos mass spectrometer. The data can be found in the PRIDE repository with indentifier PXD001077. The <em>Pyrocococus furiosis</em> reference proteome fasta file was downloaded from Uniprot on April 22, 2016. In this use case we are interested in <em>Pyrococcus</em> proteins related to transferase activity as defined by their Gene Ontology identifier (<a href="GO:0016740" class="uri">GO:0016740</a>). A fasta file with these proteins was also downloaded from Uniprot.</p>
 </div>
 <div id="database-search" class="section level2">
-<h2>Database search</h2>
+<h2><span class="header-section-number">2.2</span> Database search</h2>
 <p>In theory, the all-sub method can be used on the results from any search engine that report peptide spectrum matches (PSMs) with a score. However, this R package only provides a parser for the MS-GF+ MZident output files. Output from other search engines should be parsed and presented in the format of the output from the ‘parse_msgf_mzid()’ function (see ‘help(saas::parse_msgf_mzid)’in R). It should be realtively straightforward to adapt the code from ’parse_msgf_mzid()’ to work with other search engines. It’s very important that searches are run on a concatenated target-decoy database.</p>
 <p>The <em>Pyrococcus</em> dataset was searched against all <em>Pyrococcus</em> proteins with the MS-GF+ Search engine (v2016.10.26). The MS-GF+ parameter settings used are:</p>
 <pre><code> -t 10ppm -ti 0,1 -tda 1 -m 3 -inst 1 -e 1 -protocol 0 -ntt 2 -minLength 6 -maxLength 30 
@@ -103,7 +190,7 @@ H1O3P1,STY,opt,any,Phospho
 <p>The MS-GF+ MZident output file from this search is included in this package for use in subsequent analysis steps.</p>
 </div>
 <div id="reading-a-ms-gf-mzident-output-file." class="section level2">
-<h2>Reading a MS-GF+ MZident output file.</h2>
+<h2><span class="header-section-number">2.3</span> Reading a MS-GF+ MZident output file.</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Load the saas library
 <span class="kw">library</span>(saas)
 ## Load some convenience functions
@@ -129,7 +216,7 @@ data =<span class="st"> </span><span class="kw">parse_msgf_mzid</span>(mzid_file
 ## $ database_size &lt;dbl&gt; 2051, 2051, 2051, 2051, 2051, 2051, 2051, 2051, ...</code></pre>
 </div>
 <div id="preprocessing-the-ms-gf-search-results." class="section level2">
-<h2>Preprocessing the MS-GF+ search results.</h2>
+<h2><span class="header-section-number">2.4</span> Preprocessing the MS-GF+ search results.</h2>
 <p>By default, the ‘preprocess()’ function removes all PSMs that assigned to both a decoy and target sequence. All rows in the dataframe that belong to the same PSMs (eg. one PSMs that match multiple proteins) are collapsed into one row.</p>
 <p>When a path to a fasta file with the protein_ids from a subset of proteins in the fasta headers is provided, a new column is added that indicates if this PSM belongs to this subset of interest. These protein_ids should match the protein_ids from orginal fasta file used in the MS-GF+ search (and as indicated in the protein_id column in the data frame). This information is needed to use the all-sub method.</p>
 <p>Optionally, it’s also possible to remove PSM’s that can be assigned to multiple proteins.</p>
@@ -154,7 +241,7 @@ data_prep =<span class="st"> </span><span class="kw">preprocess</span>(data, <sp
 ## $ protein_id    &lt;chr&gt; &quot;Q8U285|Uncharacterized&quot;, &quot;Q8U168|Glycosyl&quot;, &quot;P8...</code></pre>
 </div>
 <div id="evaluating-the-decoy-psm-distribution." class="section level2">
-<h2>Evaluating the decoy PSM distribution.</h2>
+<h2><span class="header-section-number">2.5</span> Evaluating the decoy PSM distribution.</h2>
 <p>The implementation of the all-sub in this packages adopt the target-decoy approach for FDR estimation. A subset FDR can be obtained by applying TDA on the subset target and decoy PSMs.</p>
 <p>However, in very small subsets with little subset target and decoy PSMs, there can be a large sample-to-sample variability on the FDR estimates. We provide extensions to the basic subset TDA FDR to obtain more stable FDR estimates. Key is the use of a large set of decoy PSMs to reliable estimate the distribution of incorrect target PSM scores. By default we use all decoys from the complete search (subset and non-subset PSMs).</p>
 <p>Bot the classical TDA FDR and our more stable TDA FDR relie on the assumption that the distribution of incorrect target PSM scores can be approximated by the decoy PSM score distribution.</p>
@@ -166,7 +253,7 @@ diagnostics$all</code></pre></div>
 <p>We can conclude from the above diagnostic plots that the large decoy set is an appropiate candiate set to estimate the incorrect subset target PSM distribution.</p>
 </div>
 <div id="estimating-fdr-on-the-subset-of-interest." class="section level2">
-<h2>Estimating FDR on the subset of interest.</h2>
+<h2><span class="header-section-number">2.6</span> Estimating FDR on the subset of interest.</h2>
 <p>The output from ‘preprocess()’ can be immediatly used to estimate the FDR in the PSM subset of interest.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data_results =<span class="st"> </span><span class="kw">calculate_fdr</span>(data_prep, <span class="dt">score_higher =</span> <span class="ot">FALSE</span>)
 <span class="kw">glimpse</span>(data_results)</code></pre></div>
@@ -185,7 +272,7 @@ diagnostics$all</code></pre></div>
 ## $ FDR           &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ...
 ## $ FDR_BH        &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ...
 ## $ FDR_stable    &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ...</code></pre>
-<p>We can choose in the output from three different all-sub FDR estimations: The estimated stable FDR at this score cutoff for subset PSMs. 1. FDR: Calculated according the classical TDA method. Does not work well small subsets. 1. FDR_stable: Our improved FDR method which is more stable in small subsets. For large subsets, <em>FDR_stable</em> estimates will be close to <strong>FDR</strong> estimates. 1. FDR_BH: Use this when you have a large decoy set but no decoy information on the subset PSMs (eg. the search engine does not return decoy protien ids). This FDR estimate is more conservative then <strong>FDR</strong> and <strong>FDR_BH</strong>.</p>
+<p>We can choose in the output from three different all-sub FDR estimations: The estimated stable FDR at this score cutoff for subset PSMs. 1. FDR: Calculated according the classical TDA method. Does not work well small subsets. 1. FDR_stable: Our improved FDR method which is more stable in small subsets. For large subsets, <em>FDR_stable</em> estimates will be close to <strong>FDR</strong> estimates. 1. FDR_BH: Use this when you have a large decoy set but no decoy information on the subset PSMs (e.g. when the search engine does not return decoy protien ids). This FDR estimate is more conservative then <strong>FDR</strong> and <strong>FDR_BH</strong>.</p>
 <p>The ‘transferase activity’ subset is rather small with 104 target and 37 decoy PSMs.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">count</span>(data_results, subset, decoy)</code></pre></div>
 <pre><code>## Source: local data frame [4 x 3]
@@ -217,7 +304,9 @@ diagnostics$all</code></pre></div>
 ## $ FDR_BH        &lt;dbl&gt; 0.63759109, 0.52986450, 0.21983740, 0.59408666, ...
 ## $ FDR_stable    &lt;dbl&gt; 0.23074725, 0.19176049, 0.07956020, 0.21500279, ...</code></pre>
 <p>At 1% FDR, we return 31 PSMs.</p>
-<p>** sessionInfo()</p>
+</div>
+<div id="sessioninfo" class="section level2">
+<h2><span class="header-section-number">2.7</span> sessionInfo()</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sessionInfo</span>()</code></pre></div>
 <pre><code>## R version 3.3.2 (2016-10-31)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
@@ -239,6 +328,18 @@ diagnostics$all</code></pre></div>
 ##  [5] tools_3.3.2     htmltools_0.3.5 yaml_2.1.13     Rcpp_0.12.9    
 ##  [9] stringi_1.1.2   rmarkdown_1.3   knitr_1.14      stringr_1.1.0  
 ## [13] digest_0.6.11   evaluate_0.10</code></pre>
+<div id="refs" class="references">
+<div id="ref-BenjaminiHochberg1995">
+<p>Benjamini, Yoav, and Yosef Hochberg. 1995. “Controlling the False Discovery Rate: A Practical and Powerful Approach to Multiple Testing.” <em>Journal of the Royal Statistical Society: Series B</em> 57 (1). Blackwell Publishing for the Royal Statistical Society: 289–300.</p>
+</div>
+<div id="ref-Efron2008a">
+<p>Efron, Bradley. 2008. “Microarrays, Empirical Bayes and the Two-Groups Model.” <em>Statistical Science</em> 23 (1): 1–22. doi:<a href="https://doi.org/10.1214/07-STS236">10.1214/07-STS236</a>.</p>
+</div>
+<div id="ref-Elias2007">
+<p>Elias, Joshua E, and Steven P Gygi. 2007. “Target-decoy search strategy for increased confidence in large-scale protein identifications by mass spectrometry.” <em>Nature Methods</em> 4 (3): 207–14. doi:<a href="https://doi.org/10.1038/nmeth1019">10.1038/nmeth1019</a>.</p>
+</div>
+</div>
+</div>
 </div>
 
 

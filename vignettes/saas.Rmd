@@ -3,15 +3,19 @@ title: "SAAS: Search All, Assess Subset"
 author: "Adriaan Sticker"
 date: "`r Sys.Date()`"
 output: 
-  rmarkdown::html_vignette:
-  fig_caption: yes
+   html_vignette:
+    toc: true  
+    number_sections: true
+   fig_caption: yes
 #  pdf_document: default
+bibliography: bib.bib
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
+# Introduction
 In this vignette we will demonstrate how to use the 'search all, asses subset' strategy (all-sub) to correctly calculated the FDR on a PSM subset of interest in a shotgun proteomic experiment.
 
 In short, the basic all-sub workflow comprises the following steps:
@@ -20,8 +24,96 @@ In short, the basic all-sub workflow comprises the following steps:
 1. Remove all PSMs that match a protein you are not interesed in.
 1. Calculate the FDR on the resulting subset of PSMs.
 
-## Calculate the FDR
-The most common method for FDR calculation is the 
+## False discovery rate (FDR) estimation
+Let $x$ be the PSM score and assume that larger score values indicate a better match to the theoretical spectrum, e.g. in case the MS-GF+ score defined in Section \ref{MSGFplusSection}.
+The FDR is known to have a Bayesian interpretation upon defining a mixture model for the distribution of $x$ [@Efron2008a].
+\begin{equation}
+f(x) = \pi_0 f_0(x) + (1-\pi_0) f_1(x),
+\end{equation}
+with $f(x)$ the target distribution of the test statistic, $f_0(x)$ the mixture component corresponding to incorrect PSMs, $f_1(x)$ the mixture component corresponding to the correct PSMs and $\pi_0$ the fraction of incorrect PSMs.
+
+Based on the mixture distribution the FDR can be defined as the posterior probability
+\begin{equation}
+\text{FDR}(x) = Pr[\text{PSM is incorrect}\vert X\geq x].
+\end{equation}
+Let $F(x)$, $F_0(x)$ and $F_1(x)$ indicate the complementary cumulative distribution function (CCDF)
+\begin{equation}
+F_{.}(x)=\int\limits_{X=x}^{+\infty} f_{.}(X) dx
+\end{equation}
+so
+\begin{equation}
+F(x)= \pi_0 F_0(x) + (1-\pi_0) F_1(x)
+\end{equation}
+and the FDR becomes
+\begin{equation}
+\text{FDR}(x)=\frac{\pi_0 F_0(x) }{F(x)}
+\end{equation}
+
+The empirical Bayes/two-groups approach also has the great virtue that independence of the scores is not necessary as long as (1) the estimated CCDF of the marginal distribution is roughly unbiased and (2) the null component is estimated empirically [@Efron2008a].
+
+## Target-decoy approach
+In a competitive target decoy search, FDRs are estimated by dividing the number of accepted decoys PSMs by the number of accepted target PSMs at a certain MS-GF+ score cutoff [@Elias2007]. 
+For FDR estimation in the subset of interest, use only target and decoy PSMs belonging to the subset in the calculation.
+We assure a monotonic increase of FDR estimates with decreasing score values by replacing the FDR at a particular score $x$ by the maximum TDA FDR in the interval $[x,+\infty]$.
+
+Note, that in a competitive target decoy search the FDR with TDA is estimated by
+\begin{equation}
+\widehat{\text{FDR}}(x) =\frac{\# decoys | X\geq x}{\# targets | X\geq x},
+\end{equation}
+which can be rewritten as
+\small
+\begin{eqnarray*}
+\widehat{\text{FDR}}(x) &=&\frac{\frac{\#decoys}{\#targets}\frac{\# decoys | X\geq x}{\# decoys}}{\frac{\# targets | X\geq x}{\# targets}}\\
+&=&\frac{\hat \pi_0 \bar F_0(x)}{\bar F(x)}
+\end{eqnarray*}
+with $\bar F_0(x)$ and $\bar F(x)$ the empirical complementary cumulative distribution functions (ECCDFs) estimated using decoy and target PSMs, respectively.
+So, in a competitive TDA the FDR implicitly relies on the estimator of the proportion of incorrect PSMs among the targets
+\begin{equation} \hat \pi_0=\frac{\#decoys}{\#targets}.
+\end{equation}
+
+## Stable target-decoy approach for subsets 
+In small subsets we typically can expect a low number of decoy PSMs and the $\bar F_0(x)$ will be a poor estimator of $F_0(x)$.
+For improving the stability of the target-decoy approach in small subsets we propose to estimate the mixture component for incorrect PSMs using a large set of decoys with similar properties as the incorrect subset PSMs.
+Hence, the method only relies on the assumption that the incorrect target PSM scores follow the same distribution as the PSM scores of the decoy set.
+
+In many cases, the set of decoys in the complete search seems a good candidate set.
+This allows for the estimation of the mixture component of the incorrect PSMs and the marginal distribution of all PSMs non-parametrically, i.e. based on the ECCDFs $\bar F_0(x)$ using a large decoy set (e.g. of the complete search) and $\bar F(x)$ derived from the targets in the subset, respectively.
+
+The mixture proportion $\pi_0$ can still be estimated based on the ratio of the number of decoys on the number of targets in the subset upon a competitive target decoy search.
+However, the estimator $\hat \pi_0$ often becomes zero in very small subsets, inducing an FDR estimate of zero for the set of all subset target PSMs.
+We therefore propose to use the estimator
+\begin{equation}
+    \hat \pi_0=
+\begin{cases}
+  \frac{\#\text{decoys}_\text{subset}+1}{\#\text{targets}_\text{subset}}, &
+  \text{if}\ \#\text{targets} > \#\text{decoys}\\
+  1, &
+  \text{if}\ \#\text{targets} \leq \#\text{decoys}\\
+\end{cases}
+  ,
+\end{equation}
+which has a lower bound of $\frac{1}{\text{targets}_\text{subset}}$ and an upper bound of 1.
+Note that this estimator has an upward bias in small subsets, which disappears for moderate to large subsets.
+In the extreme case that we observe only one target PSM, $\hat \pi_0$ is 1 and the FDR estimator reduces to a regular p-value.
+
+Note, that a conservative estimator of the FDR is also available using the link between the Bayesian and the Benjamini-Hochberg (BH) FDR procedure, i.e. by setting the mixture proportion of the mixture component for incorrect PSMs to $\pi_0=1$ [@Efron2008a].
+
+\begin{equation}
+\widehat{\text{FDR}}(x)=\frac{\bar F_0(x)}{\bar F(x)}.
+\end{equation}
+ In very small subsets, the latter FDR estimator is still valid as long as a good estimator of the mixture component for incorrect PSMs is available.
+Benjamini and Hochberg, 1995, for instance, included an example with 15 comparisons in their seminal paper [@BenjaminiHochberg1995].
+Also note that their FDR estimator also reduces to a regular p-value in the extreme case that the subset of interest consists of one target PSM, i.e.  we set $\pi_0=1$ and $\bar F=1$ for this extreme edge case.
+
+The ECCDF $\bar F_0(x)$ will be zero for every target PSM with a score higher then the maximum decoy PSM score, inducing a FDR estimate of zero for these target PSMs.
+Decreasing the total number of decoys will lower the maximum decoy PSM score and thus lower the threshold at which the estimated FDR of the target PSMs will be zero.
+This means when only few decoys PSMs are observed, FDR estimates have high sample-to-sample variability and are biased to lower values. \todo{bias zie je in simulatie bij classical FDR}
+FDR estimates are too liberal and underestimates the true FDR.
+Therefore we recommend to have at least 1000 decoys to obtain sufficiently reliable FDR estimates in most situations. 
+Lastly, we assure a monotonic increase of FDR estimates with decreasing score values by replacing the FDR at a particular score $x$ by the maximum TDA FDR in the interval $[x,+\infty]$.
+
+# Example data analysis
+
 ## The data
 In this vignette we use data from a *Pyrocococus furiosis* sample run on a LTQ-Orbitrap Velos mass spectrometer. The data can be found in the PRIDE repository with indentifier PXD001077.
 The *Pyrocococus furiosis* reference proteome fasta file was downloaded from Uniprot on April 22, 2016.
@@ -138,7 +230,7 @@ We can choose in the output from three different all-sub FDR estimations:
 The estimated stable FDR at this score cutoff for subset PSMs.
 1. FDR: Calculated according the classical TDA method. Does not work well small subsets.
 1. FDR_stable: Our improved FDR method which is more stable in small subsets. For large subsets, *FDR_stable* estimates will be close to **FDR** estimates.
-1. FDR_BH: Use this when you have a large decoy set but no decoy information on the subset PSMs (eg. the search engine does not return decoy protien ids). This FDR estimate is more conservative then **FDR** and **FDR_BH**.
+1. FDR_BH: Use this when you have a large decoy set but no decoy information on the subset PSMs (e.g. when the search engine does not return decoy protien ids). This FDR estimate is more conservative then **FDR** and **FDR_BH**.
 
 The 'transferase activity' subset is rather small with 104 target and 37 decoy PSMs.
 ```{r, cache= TRUE}
@@ -155,7 +247,8 @@ glimpse(results_1_FDR)
 ```
 At 1\% FDR, we return 31 PSMs.
 
-** sessionInfo()
+## sessionInfo()
+
 ```{r}
 sessionInfo()
 ```

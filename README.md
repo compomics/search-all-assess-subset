@@ -3,7 +3,7 @@ An implementation of the Search All, Asses Subset strategy for FDR estimation in
 
 A user-friendly GUI version of saas is hosted [here](http://iomics.ugent.be/saas/).
 
-More information on how to use the SAAS package can be found in the [Vignette](http://htmlpreview.github.io/?https://github.com/compomics/search-all-assess-subset/blob/master/vignettes/saas.html).
+More information on how FDR estimation in subsets works and on how to use the SAAS package can be found in the [vignette](http://htmlpreview.github.io/?https://github.com/compomics/search-all-assess-subset/blob/master/vignettes/saas.html).
 
 ## Installation
 
