@@ -203,8 +203,10 @@ output$plot_theo = renderPlot({
 ##' @author
 ##' @keywords internal
 ui = function() fluidPage(
-                 navbarPage(
-  "Search All, Assess Subset",
+                  navbarPage(
+ header = list(tags$a(href = 'https://github.com/compomics/search-all-assess-subset/',
+                 'https://github.com/compomics/search-all-assess-subset/')),
+ title =  'Search All, Assess Subset',
   tabPanel('Data input',
            sidebarLayout(
              sidebarPanel(width = 7,

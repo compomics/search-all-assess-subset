@@ -12,7 +12,7 @@
 
 <meta name="author" content="Adriaan Sticker" />
 
-<meta name="date" content="2017-01-27" />
+<meta name="date" content="2017-01-29" />
 
 <title>SAAS: Search All, Assess Subset</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">SAAS: Search All, Assess Subset</h1>
 <h4 class="author"><em>Adriaan Sticker</em></h4>
-<h4 class="date"><em>2017-01-27</em></h4>
+<h4 class="date"><em>2017-01-29</em></h4>
 
 
 
@@ -81,9 +81,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>Remove all PSMs that match a protein you are not interesed in.</li>
 <li>Calculate the FDR on the resulting subset of PSMs.</li>
 </ol>
-<div id="the-data" class="section level2">
-<h2>The data</h2>
-<p>In this vignette we use data from a <em>Pyrocococus furiosis</em> sample run on a LTQ-Orbitrap Velos mass spectrometer. The data can be found in the PRIDE repository with indentifier PXD001077. The <em>Pyrocococus furiosis</em> reference proteome fasta file was downloaded from Uniprot on April 22, 2016. In this use case we are interested in <em>Pyrococcus</em> proteins related to transferase activity as defined by their Gene Ontology identifier (<a href="GO:0016740" class="uri">GO:0016740</a>). A fasta file with these proteins was also downloaded from Uniprot.</p>
+<div id="calculate-the-fdr" class="section level2">
+<h2>Calculate the FDR</h2>
+<p>The most common method for FDR calculation is the ## The data In this vignette we use data from a <em>Pyrocococus furiosis</em> sample run on a LTQ-Orbitrap Velos mass spectrometer. The data can be found in the PRIDE repository with indentifier PXD001077. The <em>Pyrocococus furiosis</em> reference proteome fasta file was downloaded from Uniprot on April 22, 2016. In this use case we are interested in <em>Pyrococcus</em> proteins related to transferase activity as defined by their Gene Ontology identifier (<a href="GO:0016740" class="uri">GO:0016740</a>). A fasta file with these proteins was also downloaded from Uniprot.</p>
 </div>
 <div id="database-search" class="section level2">
 <h2>Database search</h2>
@@ -217,6 +217,28 @@ diagnostics$all</code></pre></div>
 ## $ FDR_BH        &lt;dbl&gt; 0.63759109, 0.52986450, 0.21983740, 0.59408666, ...
 ## $ FDR_stable    &lt;dbl&gt; 0.23074725, 0.19176049, 0.07956020, 0.21500279, ...</code></pre>
 <p>At 1% FDR, we return 31 PSMs.</p>
+<p>** sessionInfo()</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sessionInfo</span>()</code></pre></div>
+<pre><code>## R version 3.3.2 (2016-10-31)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Arch Linux
+## 
+## locale:
+##  [1] LC_CTYPE=nl_BE.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=nl_BE.UTF-8        LC_COLLATE=nl_BE.UTF-8    
+##  [5] LC_MONETARY=nl_BE.UTF-8    LC_MESSAGES=nl_BE.UTF-8   
+##  [7] LC_PAPER=nl_BE.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=nl_BE.UTF-8 LC_IDENTIFICATION=C       
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## loaded via a namespace (and not attached):
+##  [1] backports_1.0.4 magrittr_1.5    rprojroot_1.1   formatR_1.4    
+##  [5] tools_3.3.2     htmltools_0.3.5 yaml_2.1.13     Rcpp_0.12.9    
+##  [9] stringi_1.1.2   rmarkdown_1.3   knitr_1.14      stringr_1.1.0  
+## [13] digest_0.6.11   evaluate_0.10</code></pre>
 </div>
 
 

@@ -20,6 +20,8 @@ In short, the basic all-sub workflow comprises the following steps:
 1. Remove all PSMs that match a protein you are not interesed in.
 1. Calculate the FDR on the resulting subset of PSMs.
 
+## Calculate the FDR
+The most common method for FDR calculation is the 
 ## The data
 In this vignette we use data from a *Pyrocococus furiosis* sample run on a LTQ-Orbitrap Velos mass spectrometer. The data can be found in the PRIDE repository with indentifier PXD001077.
 The *Pyrocococus furiosis* reference proteome fasta file was downloaded from Uniprot on April 22, 2016.
@@ -152,3 +154,8 @@ results_1_FDR = filter(data_results, subset, !decoy, FDR_stable >= .01)
 glimpse(results_1_FDR)
 ```
 At 1\% FDR, we return 31 PSMs.
+
+** sessionInfo()
+```{r}
+sessionInfo()
+```
