@@ -17,7 +17,9 @@ preprocess(dat, remove_target_decoy_PSM = TRUE,
 \item{is_subset}{Location of fasta file with  protein_id of the subset of interest in the fasta headers.}
 }
 \value{
-Data frame with the same columns as \code{dat''. The column protein_id contains all protein_ids that can be assigned to this PSM. Multiple protein_ids are separated by};''.
+Data frame with the same columns as ``dat''.
+The column protein_id contains all protein_ids that can be assigned to this PSM.
+Multiple protein_ids are separated by ``;''.
 When ``is_subset'' is specified, two columns are added:
 \describe{
 \item{subset}{TRUE if sequence can be assigned to a subset protein id}

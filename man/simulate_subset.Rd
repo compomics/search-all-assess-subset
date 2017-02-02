@@ -16,12 +16,12 @@ simulate_subset(n, pi0, sims = 1)
 \value{
 A data frame with ``sims'' rows and 6 rows:
 \describe{
-\item{n}{number of PSMs.}
-\item{pi0}{theoretical \eqn{\pi_0}.}
-\item{decoy_n}{number of decoy PSMs.}
-\item{target_n}{number of target PSMs.}
-\item{H0_n}{number of incorrect target PSMs.}
-\item{H1_n}{number of correct target PSMs.}
+  \item{n}{number of PSMs.}
+  \item{pi0}{theoretical \eqn{\pi_0}.}
+  \item{decoy_n}{number of decoy PSMs.}
+  \item{target_n}{number of target PSMs.}
+  \item{H0_n}{number of incorrect target PSMs.}
+  \item{H1_n}{number of correct target PSMs.}
 }
 }
 \description{

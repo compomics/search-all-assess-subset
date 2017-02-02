@@ -19,7 +19,14 @@ Target and decoy PSMs are assumbed to be from a competitive target decoy databas
 \item{score_higher}{TRUE if a higher score means a better PSM.}
 }
 \value{
-A data frame containing all columns in \code{df''. Following columns are added: \describe{ \item{pi_0_cons}{conservative estimation of \eqn{\pi_0}.} \item{FDR}{estimated subset PSM qvalues calculated according the competitive target decoy approach.} \item{FDR_BH}{estimated subset PSM qvalues calculated according the Benjamini Hochbergh procedure. When provided, non-subset decoy PSMs are used to stabilize estimates in small subsets} \item{FDR_stable}{estimated subset PSM qvalues calculated with}pi_0_cons''.
+A data frame containing all columns in ``df''.
+Following columns are added:
+\describe{
+\item{pi_0_cons}{conservative estimation of \eqn{\pi_0}.}
+\item{FDR}{estimated subset PSM qvalues calculated according the competitive target decoy approach.}
+\item{FDR_BH}{estimated subset PSM qvalues calculated according the Benjamini Hochbergh procedure.
+When provided, non-subset decoy PSMs are used to stabilize estimates in small subsets}
+\item{FDR_stable}{estimated subset PSM qvalues calculated with ``pi_0_cons''.
 When provided, non-subset decoy PSMs are used to stabilize estimates in small subsets}
 }
 }

@@ -22,4 +22,4 @@ Suggests:
     rmarkdown
 RoxygenNote: 6.0.0
 VignetteBuilder: knitr
-Roxygen: list(markdown = TRUE)
+Roxygen: list(markdown = FALSE)
