@@ -27,4 +27,3 @@ x = rpi0(100000, 10 ,3 )
 hist(x, breaks = 50 , xlab = 'pi0', ylab = 'counts')
 
 }
-

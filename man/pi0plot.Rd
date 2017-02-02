@@ -4,12 +4,14 @@
 \alias{pi0plot}
 \title{Creates density plot of the pi0 distribution.}
 \usage{
-pi0plot(n_targets, n_decoys)
+pi0plot(n_targets, n_decoys, conservative_pi0 = TRUE)
 }
 \arguments{
 \item{n_targets}{vector of observed target PSMs.}
 
 \item{n_decoys}{vector of observed decoy PSMs.}
+
+\item{conservative_pi0}{logical; If TRUE (default), adds horizontal line indicating the conservative \eqn{\pi_0} estimate.}
 }
 \value{
 ggplot object.
@@ -24,4 +26,3 @@ This estimate is used in our more stable FDR estimation in the subset PSMs of in
 ## pi0plot(10,3)
 
 }
-

@@ -10,4 +10,3 @@ check_input(rawinput, sep = ",")
 .. content for \details{} ..
 }
 \keyword{internal}
-

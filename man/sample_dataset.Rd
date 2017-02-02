@@ -34,6 +34,15 @@ sample_dataset(H1_n = 160, H0_n = 40, decoy_n = H0_n,
 
 \item{decoy_large_sd}{sd of the non subset decoy PSM distribution.}
 }
+\value{
+dataframe with 4 columns:
+\describe{
+\item{score}{score assigned to the peptide to spectrum match (PSM).}
+\item{decoy}{TRUE if decoy PSM, FALSE otherwise.}
+\item{H0}{TRUE if incorrect target PSM, FALSE otherwise.}
+\item{subset}{TRUE if PSM belongs to the subset in interest, FALSE or otherwise.}
+}
+}
 \description{
 The scores are sampled from a two-component mixture distribution of Gaussians.
 }
@@ -65,4 +74,3 @@ legend('topright', c('decoys', 'incorrect targets', 'correct targets'),
 
 }
 \keyword{internal}
-

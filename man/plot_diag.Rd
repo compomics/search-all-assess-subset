@@ -6,6 +6,18 @@
 \usage{
 plot_diag(df, score_higher = TRUE)
 }
+\arguments{
+\item{df}{dataframe with at least 3 columns:
+\describe{
+\item{score}{score assigned to the peptide to spectrum match (PSM).}
+\item{subset}{TRUE if PSM belongs to the subset in interest, FALSE otherwise.}
+\item{decoy}{TRUE if decoy PSM, FALSE otherwise.}
+}}
+
+\item{score_higher}{TRUE if a higher score means a better PSM.
+Additional columns are allowed but ignored.
+Target and decoy PSMs are assumbed to be from a competitive target decoy database search.}
+}
 \value{
 ggplot object.
 }
@@ -20,7 +32,6 @@ Four diagnostic plots are created:
 }
 \examples{
 
-
 ## Simulate a dataset with 140 correct target subset PSMs, 60 incorrect target subset PSMS,
 ## 60 decoy subset PSMs and 2000 additional decoy PSMs.
 set.seed(10)
@@ -31,4 +42,3 @@ d = sample_dataset(H1_n = 140,H0_n = 60, decoy_n = 60 ,decoy_large_n = 2000,
 plot_diag(d)
 
 }
-

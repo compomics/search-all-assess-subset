@@ -34,4 +34,3 @@ plot(dens, xlab = 'pi0', ylab = 'density')
 pi0plot(10,3)
 
 }
-

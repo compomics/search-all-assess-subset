@@ -25,7 +25,7 @@ zip_file_path = system.file("extdata", "extdata.zip", package = "saas")
 ## Unzip and get the (temporary) location of the mzid file with the MS-GF+ search results from a
 ## competitive target decoy search of the complete pyrococcus proteome against a pyrococcus dataset.
 mzid_file_path = unzip(zip_file_path, 'pyrococcus.mzid',exdir = tempdir())
-## Parse the mzid file
+## Read and parse the mzid file
 dat = parse_msgf_mzid(mzid_file_path)
 
 ## Unzip and get the (temporary) location of the file with fasta headers.
@@ -38,4 +38,3 @@ is_subset = id_is_present(protein_ids, fasta_file_path)
 ## Check how many of the identified proteins are subset and non subset protiens.
 table(is_subset)
 }
-

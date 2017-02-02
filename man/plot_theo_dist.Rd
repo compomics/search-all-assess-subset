@@ -12,4 +12,3 @@ plot_theo_dist(H0_mean = 2.75, H1_mean = 3.31, H0_sd = 0.13,
 plots the theoretical distribution of all components in the PSM distribution.
 }
 \keyword{internal}
-

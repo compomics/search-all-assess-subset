@@ -21,6 +21,16 @@
 #' pi0plot(10,3)
 #'
 dpi0= function(pi0, n_targets, n_decoys) {
+  if (!(n_targets > 0)) {
+    warning('Number of targets should be higher then 0.')
+    return(rep(NaN,length(pi0)))
+  }
+
+  if (!(n_decoys >= 0)) {
+    warning('Number of decoys should be 0 or higher.')
+  return(rep(NaN,length(pi0)))
+  }
+
   pi0 = ifelse((pi0 > 1) | (pi0 < 0),NaN,pi0)
   dbeta(pi0 / (1 + pi0), n_decoys + 1, n_targets + 1) *
     1 / (1 + pi0) ^ 2 /
@@ -43,6 +53,16 @@ dpi0= function(pi0, n_targets, n_decoys) {
 ##' hist(x, breaks = 50 , xlab = 'pi0', ylab = 'counts')
 ##'
 rpi0 = function(n, n_targets, n_decoys) {
+  if (!(n_targets > 0)) {
+    warning('Number of targets should be higher then 0.')
+    return(rep(NaN,length(n)))
+  }
+
+  if (!(n_decoys >= 0)) {
+    warning('Number of decoys should be 0 or higher.')
+  return(rep(NaN,length(n)))
+  }
+
   x = as.numeric()
   ## sample until n samples has been reached
   while(n > 0){
@@ -172,6 +192,7 @@ calculate_fdr = function(df,score_higher = TRUE) {
 #'
 #' @param n_targets vector of observed target PSMs.
 #' @param n_decoys vector of observed decoy PSMs.
+#' @param conservative_pi0 logical; If TRUE (default), adds horizontal line indicating the conservative \eqn{\pi_0} estimate.
 #'
 #' @return ggplot object.
 #' @export
@@ -181,13 +202,11 @@ calculate_fdr = function(df,score_higher = TRUE) {
 #' ## Visualize the pi0 distribution when observing 10 targets and 3 decoys
 #' ## pi0plot(10,3)
 #'
-pi0plot = function(n_targets, n_decoys) {
+ pi0plot = function(n_targets, n_decoys, conservative_pi0 =  TRUE) {
   grid = seq(0, 1, .001)
   dens = dpi0(grid, n_targets, n_decoys)
   df = data_frame(grid, dens)
-  ggplot(df, aes(x = grid, y = dens)) + geom_line(col = 'dark grey') +
-    geom_vline(xintercept = (n_decoys + 1) / (n_targets + 1),
-               col = 'black') +
+  p = ggplot(df, aes(x = grid, y = dens)) + geom_line(col = 'dark grey') +
     labs(
       x = expression(pi[0]),
       y = 'Density',
@@ -200,6 +219,13 @@ pi0plot = function(n_targets, n_decoys) {
       axis.text = element_text(size = rel(1.2)),
       axis.title.y = element_text(angle = 0)
     )
+
+  if(conservative_pi0 == TRUE){
+    pi0_cons = (n_decoys + 1) / n_targets
+    pi0_cons = ifelse(pi0_cons > 1, 1, ifelse(pi0_cons < 0, 0, pi0_cons))
+    p = p +geom_vline(xintercept = pi0_cons, col = 'black')
+  }
+  return(p)
 }
 
 #' Creates PP plot of two empirical distributions.
@@ -269,8 +295,8 @@ PPplot = function(score, label, pi0 = 0,score_higher = TRUE, title = 'PP plot of
 #' \item{score}{score assigned to the peptide to spectrum match (PSM).}
 #' \item{subset}{TRUE if PSM belongs to the subset in interest, FALSE otherwise.}
 #' \item{decoy}{TRUE if decoy PSM, FALSE otherwise.}
-#' @param score_higher TRUE if a higher score means a better PSM.
 #' }
+#' @param score_higher TRUE if a higher score means a better PSM.
 #'Additional columns are allowed but ignored.
 #' Target and decoy PSMs are assumbed to be from a competitive target decoy database search.
 #'
@@ -279,7 +305,6 @@ PPplot = function(score, label, pi0 = 0,score_higher = TRUE, title = 'PP plot of
 #' @export
 #' @import dplyr
 #' @examples
-#'
 #'
 #' ## Simulate a dataset with 140 correct target subset PSMs, 60 incorrect target subset PSMS,
 #' ## 60 decoy subset PSMs and 2000 additional decoy PSMs.
@@ -337,7 +362,14 @@ plot_diag = function(df, score_higher = TRUE){
 #' @param decoy_large_mean mean of the non subset decoy PSM distribution.
 #' @param decoy_large_sd sd of the non subset decoy PSM distribution.
 #'
-#' @return
+#' @return dataframe with 4 columns:
+#'\describe{
+#' \item{score}{score assigned to the peptide to spectrum match (PSM).}
+#' \item{decoy}{TRUE if decoy PSM, FALSE otherwise.}
+#' \item{H0}{TRUE if incorrect target PSM, FALSE otherwise.}
+#' \item{subset}{TRUE if PSM belongs to the subset in interest, FALSE or otherwise.}
+#' }
+
 #' @export
 #' @import dplyr
 #' @keywords internal
@@ -425,7 +457,6 @@ sample_dataset = function(H1_n = 160,H0_n = 40, decoy_n = H0_n ,decoy_large_n = 
 ##' @import stringr
 ##' @import mzR
 ##' @export
-##' @author
 ##' @examples
 ##'
 ##' ## Location of the zipped data files
@@ -489,7 +520,6 @@ parse_msgf_mzid = function(mzid_path){
 ##' is_subset = id_is_present(protein_ids, fasta_file_path)
 ##' ## Check how many of the identified proteins are subset and non subset protiens.
 ##' table(is_subset)
-##' @author
 id_is_present = function(protein_id,fastapath){
   fas = readr::read_lines(fastapath)
   headers = fas[grepl('>',fas,fixed = TRUE)]
@@ -546,7 +576,6 @@ id_is_present = function(protein_id,fastapath){
 ##'
 ##' @import dplyr
 ##' @export
-##' @author
 preprocess = function(dat,remove_target_decoy_PSM = TRUE, remove_multiple_proteins_PSM = FALSE,
                        is_subset = NULL){
   if (remove_target_decoy_PSM == TRUE){

@@ -129,7 +129,26 @@ server = function(input, output, session) {
   }, width = 940,height = 410)
 
   ## logic simulation tab
-  #######################
+#######################
+plotinput = reactiveValues()
+  check_min_val = function(par,val){
+    observe({
+      plotinput[[par]] = input[[par]]
+      if (is.na(input[[par]]) |!(input[[par]] > 0)) {
+        updateTextInput(session,inputId = par,value = val)
+        plotinput[[par]] = val
+      }})
+  }
+
+  ## check for impossible values in input
+  check_min_val("subset_n",1)
+  check_min_val("decoy_n",0)
+  check_min_val("decoy_extra_n",0)
+  check_min_val("H1_sd",0)
+  check_min_val("H0_sd",0)
+  check_min_val("decoy_sd",0)
+  check_min_val("decoy_extra_sd",0)
+
   observeEvent((input$make_subset_action),{
     par = simulate_subset(input$subset_n,input$subset_pi0)
     updateTextInput(session,inputId = 'H1_n',value = par$H1_n)
@@ -138,13 +157,15 @@ server = function(input, output, session) {
   })
 
   ## check if decoy dist are the same and change value of respective boxes
-observe({
+  observe({
     if(input$check_subset_decoys_same){
       updateTextInput(session,inputId = 'decoy_mean',value = input$H0_mean)
+      plotinput$decoy_mean = input$H0_mean
       updateTextInput(session,inputId = 'decoy_sd',value = input$H0_sd)
     }
-    if(input$check_subset_decoys_same){
+    if(input$check_extra_decoys_same){
       updateTextInput(session,inputId = 'decoy_extra_mean',value = input$decoy_mean)
+      plotinput$decoy_extra_mean = input$decoy_mean
       updateTextInput(session,inputId = 'decoy_extra_sd',value = input$decoy_sd)
     }
   })
@@ -158,12 +179,12 @@ output$plot_theo = renderPlot({
   plot_theo_dist(
                  H0_mean = input$H0_mean,
                  H1_mean = input$H1_mean,
-                 H0_sd = input$H0_sd,
-                 H1_sd = input$H1_sd,
-                 decoy_mean = input$decoy_mean,
-                 decoy_sd = input$decoy_sd,
-                 decoy_extra_mean = input$decoy_extra_mean,
-                 decoy_extra_sd = input$decoy_extra_sd)$plot
+                 H0_sd = plotinput$H0_sd,
+                 H1_sd = plotinput$H1_sd,
+                 decoy_mean = plotinput$decoy_mean,
+                 decoy_sd = plotinput$decoy_sd,
+                 decoy_extra_mean = plotinput$decoy_extra_mean,
+                 decoy_extra_sd = plotinput$decoy_extra_sd)$plot
 }, width = 400, height = 300)
 
   output$plot_sim_diag = renderPlot({
@@ -356,16 +377,16 @@ For more information on how to interpret the generated diagnostic plots, please 
 ,
 mainPanel(width = 12,
           column(6,
-                 fluidRow(column(6, '# subset target  PSMs'),
+                 fluidRow(column(6, '# subset PSMs'),
                           column(6, tags$input(id = 'subset_n',type = "number",
                                                value = 200,min = 1,step = 10))
                           ),
                  fluidRow(column(6, '# subset decoy PSMs'),
                           column(6, tags$input(id = 'decoy_n',type = "number",
-                                               value = 20,min = 1,step = 10))),
+                                               value = 20,min = 0,step = 10))),
                  fluidRow(column(6, '# extra decoys'),
                           column(6, tags$input(id = 'decoy_extra_n',type = "number",
-                                               value = 2000,min = 1,step = 10))))
+                                               value = 2000,min = 0,step = 10))))
          ,
           ## column(1,actionButton("action_simulate", label = "GO")),
           column(6,checkboxInput("check_also_decoys", label = "Simulate also decoys"),
@@ -414,7 +435,7 @@ mainPanel(width = 12,
           column(6,plotOutput('plot_theo'))
           ,
           fluidRow(
-          actionButton("action_simulate", label = "SIMULATE"),
+          actionButton("action_simulate", label = "SIMULATE",style = 'font-size:150%'),
             column(12,plotOutput('plot_sim_diag')))
           )
 ))

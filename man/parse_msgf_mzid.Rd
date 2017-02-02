@@ -26,6 +26,9 @@ See \url{https://omics.pnl.gov/software/ms-gf}
 for more info on how to perform a database search on MSMS dataset with MS-GF+ and how to generate a mzID file.
 Note that most functions in these package require data from a competitive target decoy search.
 }
+\details{
+We take the MS-GF+ SpecEValue as the PSM score for FDR calculation.
+}
 \examples{
 
 ## Location of the zipped data files
@@ -38,4 +41,3 @@ mzid_file_path = unzip(zip_file_path, 'pyrococcus.mzid',exdir = tempdir())
 parse_msgf_mzid(mzid_file_path)
 
 }
-

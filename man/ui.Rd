@@ -10,4 +10,3 @@ ui()
 UI shiny app
 }
 \keyword{internal}
-

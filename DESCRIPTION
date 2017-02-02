@@ -3,8 +3,8 @@ Title: An implementation of the Search All, Asses Subset strategy for FDR
     estimation shotgun proteomics.
 Version: 0.0.0.9000
 Authors@R: person("Adriaan", "Sticker", email = "adriaan.sticker@ugent.be", role = c("aut", "cre"))
-Description:
-    An implementation of the Search All, Asses Subset strategy for FDR estimation in shotgun proteomics.
+Description: An implementation of the Search All, Asses Subset strategy for FDR
+    estimation in shotgun proteomics.
 Depends:
     R (>= 3.3.0)
 License: Apache License, Version 2.0
@@ -20,5 +20,6 @@ Suggests:
     mzR (>= 2.8.0),
     knitr,
     rmarkdown
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.0
 VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)

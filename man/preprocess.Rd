@@ -17,9 +17,7 @@ preprocess(dat, remove_target_decoy_PSM = TRUE,
 \item{is_subset}{Location of fasta file with  protein_id of the subset of interest in the fasta headers.}
 }
 \value{
-Data frame with the same columns as ``dat''.
-The column protein_id contains all protein_ids that can be assigned to this PSM.
-Multiple protein_ids are separated by ``;''.
+Data frame with the same columns as \code{dat''. The column protein_id contains all protein_ids that can be assigned to this PSM. Multiple protein_ids are separated by};''.
 When ``is_subset'' is specified, two columns are added:
 \describe{
 \item{subset}{TRUE if sequence can be assigned to a subset protein id}
@@ -39,8 +37,8 @@ zip_file_path = system.file("extdata", "extdata.zip", package = "saas")
 ## Unzip and get the (temporary) location of the mzid file with the MS-GF+ search results from a
 ## competitive target decoy search of the complete pyrococcus proteome against a pyrococcus dataset.
 mzid_file_path = unzip(zip_file_path, 'pyrococcus.mzid',exdir = tempdir())
-## Parse the mzid file
-dat = parse_msgf_mzid(mzid_file_path)
+## Read and parse the mzid file
+data = parse_msgf_mzid(mzid_file_path)
 
 ## Unzip and get the (temporary) location of the file with fasta headers.
 ## Each fasta header contains a protein_id from the protein subset of interest.
@@ -48,7 +46,7 @@ dat = parse_msgf_mzid(mzid_file_path)
 fasta_file_path = unzip(zip_file_path, 'transferase_activity_[GO:0016740].fasta', exdir = tempdir())
 
 ## Preprocess the data before FDR estimation.
-data_prep = preprocess(dat, is_subset = fasta_file_path)
+data_prep = preprocess(data, is_subset = fasta_file_path)
 
 ## Estimate the FDR in the subset.
 data_result = calculate_fdr(data_prep, score_higher = FALSE)
@@ -56,4 +54,3 @@ data_result = calculate_fdr(data_prep, score_higher = FALSE)
 table(data_result$FDR_stable < .01)
 
 }
-
