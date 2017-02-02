@@ -98,8 +98,8 @@ rpi0 = function(n, n_targets, n_decoys) {
 #' @import tibble
 #' @examples
 #'
-#' ## Simulate the number of decoys, correct targets and incorrect targets in 10 datasets that consist of
-#' ## 100 PSMs and that have on average 20% incorrect target PSMs.
+#' ## Simulate the number of decoys, correct targets and incorrect targets in 10 datasets that
+#' ## consist of 100 PSMs and that have on average 20% incorrect target PSMs.
 #' simulate_subset(100, .2, 10)
 #'
 simulate_subset = function(n ,pi0 ,sims = 1){

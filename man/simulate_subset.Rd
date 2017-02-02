@@ -29,8 +29,8 @@ Random generation of number of decoy, correct target and incorrect target PSMs a
 }
 \examples{
 
-## Simulate the number of decoys, correct targets and incorrect targets in 10 datasets that consist of
-## 100 PSMs and that have on average 20\% incorrect target PSMs.
+## Simulate the number of decoys, correct targets and incorrect targets in 10 datasets that
+## consist of 100 PSMs and that have on average 20\% incorrect target PSMs.
 simulate_subset(100, .2, 10)
 
 }
