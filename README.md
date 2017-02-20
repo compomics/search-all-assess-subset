@@ -2,8 +2,7 @@
 An implementation of the Search All, Asses Subset strategy for FDR estimation in shotgun proteomics.
 
 A preprint of the manuscript on the search-all-assess FDR procedure can be found on bioRxiv ([https://doi.org/10.1101/094581](https://doi.org/10.1101/094581)).
->Mass spectrometrists should search for all peptides, but assess only the ones they care about
-
+>Mass spectrometrists should search for all peptides, but assess only the ones they care about\n
 >(Adriaan Sticker, Lieven Clement, Lennart Martens)
 
 A user-friendly GUI version of saas is hosted [here](http://iomics.ugent.be/saas/).
