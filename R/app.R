@@ -263,7 +263,7 @@ step **2.** and **3.**'
                           checkboxInput("scorehigher", "Are higher scores better?", TRUE),
                           HTML(markdownToHTML(text =
                                                 '
-Use the **Choose File** button above to load a CSV file from your computer
+Use the **Browse...** button above to load a CSV file from your computer
 or paste the data in the **text area** to the right.
 
 Adhere to the following format:
@@ -275,6 +275,8 @@ Adhere to the following format:
  + **subset**:  FALSE or TRUE: TRUE indicates that the PSM matches a subset peptide sequence
 * The first row are the column names
 * All columns should be comma separated
+
+Note that the row with extra set of decoys (**decoy** = TRUE and **subset** = FALSE) are not necessarily the non-subset decoys from the same mass spectrometry run but can be chosen by the user.
 
 Example input:
 <pre>
@@ -340,7 +342,7 @@ column(width = 12, conditionalPanel(condition = "input.diag_more_info == true",
                         HTML(markdownToHTML(text =  '
 **Panel a** shows the posterior distribution of pi_0 given the observed number of target and decoy PSMs in the subset.
 The vertical line indicates the conservative pi_0 estimate used in the calculations.
-At very high pi_0 uncertainty (broad peak), you can opt to use the BH procedure to minimize sample to sample variability.
+At very high pi_0 uncertainty (broad peak), you can opt to use the BH procedure to minimize sample to sample variability (see **FDR_BH** in the output).
 However, this will come at the expense of too conservative PSM lists.
 
 Our improved TDA for subsets relies on the assumption that incorrect subset PSMs and the complete set of decoys have the same distribution.
@@ -358,6 +360,9 @@ The whole plot should follow the identity line, indicating that the complete set
 To verify that the subset decoys (and thus also the complete set of decoys) are representative for the mixture component for incorrect PSMs of the target mixture distribution, we look at the PP-plot of the subset decoys against the subset targets in panel **d**.
 The profile should look as described for panel **b**.
 If the profile matches in panel **d** but does not for panel **b**, then we suggest to not use the extra decoy set and use only the subset decoys for FDR estimation.
+When the profile does not match in panel **d**, the subset decoys might not be representative for incorrect PSMs. This can indicate that pi_0 is estimated incorrectly, since this is based on the subset PSM scores.
+In this case, the first part of the plot in panel **d** can deviate from the (incorrect) pi_0 slope line.
+But if this first part is linear, it still indicates that the extra set of decoys is representative for the mixture component of incorrect target PSMs. Since pi_0 is unknown we set it to 1 (see **FDR_BH** in the output).
 
 When you are not sure how the diagnostic plots should look like, you can simulate your own data under various (erratic) settings in the simulation tab.
 '))))))

@@ -24,8 +24,13 @@ In short, the basic all-sub workflow comprises the following steps:
 1. Remove all PSMs that match a protein you are not interesed in.
 1. Calculate the FDR on the resulting subset of PSMs.
 
+A preprint of the manuscript on the search-all-assess FDR procedure can be found on bioRxiv ([https://doi.org/10.1101/094581](https://doi.org/10.1101/094581)).
+
+>Mass spectrometrists should search for all peptides, but assess only the ones they care about<br/>
+>Adriaan Sticker, Lieven Clement, Lennart Martens [-@Sticker2017]
+
 ## False discovery rate (FDR) estimation
-Let $x$ be the PSM score and assume that larger score values indicate a better match to the theoretical spectrum, e.g. in case the MS-GF+ score defined in Section \ref{MSGFplusSection}.
+Let $x$ be the PSM score and assume that larger score values indicate a better match to the theoretical spectrum.
 The FDR is known to have a Bayesian interpretation upon defining a mixture model for the distribution of $x$ [@Efron2008a].
 \begin{equation}
 f(x) = \pi_0 f_0(x) + (1-\pi_0) f_1(x),
@@ -54,7 +59,7 @@ The empirical Bayes/two-groups approach also has the great virtue that independe
 ## Target-decoy approach
 In a competitive target decoy search, FDRs are estimated by dividing the number of accepted decoys PSMs by the number of accepted target PSMs at a certain MS-GF+ score cutoff [@Elias2007]. 
 For FDR estimation in the subset of interest, use only target and decoy PSMs belonging to the subset in the calculation.
-We assure a monotonic increase of FDR estimates with decreasing score values by replacing the FDR at a particular score $x$ by the maximum TDA FDR in the interval $[x,+\infty]$.
+We assure a monotonic increase of FDR estimates with decreasing score values by replacing the FDR at a particular score $x$ by the minimum TDA FDR in the interval $[-\infty,x]$.
 
 Note, that in a competitive target decoy search the FDR with TDA is estimated by
 \begin{equation}
@@ -76,7 +81,8 @@ In small subsets we typically can expect a low number of decoy PSMs and the $\ba
 For improving the stability of the target-decoy approach in small subsets we propose to estimate the mixture component for incorrect PSMs using a large set of decoys with similar properties as the incorrect subset PSMs.
 Hence, the method only relies on the assumption that the incorrect target PSM scores follow the same distribution as the PSM scores of the decoy set.
 
-In many cases, the set of decoys in the complete search seems a good candidate set.
+This large set of decoys PSM scores can be designed by the user.
+However often, the set of decoys in the complete search seems a good candidate set.
 This allows for the estimation of the mixture component of the incorrect PSMs and the marginal distribution of all PSMs non-parametrically, i.e. based on the ECCDFs $\bar F_0(x)$ using a large decoy set (e.g. of the complete search) and $\bar F(x)$ derived from the targets in the subset, respectively.
 
 The mixture proportion $\pi_0$ can still be estimated based on the ratio of the number of decoys on the number of targets in the subset upon a competitive target decoy search.
@@ -105,12 +111,12 @@ Note, that a conservative estimator of the FDR is also available using the link 
 Benjamini and Hochberg, 1995, for instance, included an example with 15 comparisons in their seminal paper [@BenjaminiHochberg1995].
 Also note that their FDR estimator also reduces to a regular p-value in the extreme case that the subset of interest consists of one target PSM, i.e.  we set $\pi_0=1$ and $\bar F=1$ for this extreme edge case.
 
-The ECCDF $\bar F_0(x)$ will be zero for every target PSM with a score higher then the maximum decoy PSM score, inducing a FDR estimate of zero for these target PSMs.
+The ECCDF $\bar F_0(x)$ will be zero for every target PSM with a score higher then the maximum decoy PSM score, inducing an FDR estimate of zero for these target PSMs.
 Decreasing the total number of decoys will lower the maximum decoy PSM score and thus lower the threshold at which the estimated FDR of the target PSMs will be zero.
 This means when only few decoys PSMs are observed, FDR estimates have high sample-to-sample variability and are biased to lower values. \todo{bias zie je in simulatie bij classical FDR}
 FDR estimates are too liberal and underestimates the true FDR.
 Therefore we recommend to have at least 1000 decoys to obtain sufficiently reliable FDR estimates in most situations. 
-Lastly, we assure a monotonic increase of FDR estimates with decreasing score values by replacing the FDR at a particular score $x$ by the maximum TDA FDR in the interval $[x,+\infty]$.
+Lastly, we assure a monotonic increase of FDR estimates with decreasing score values by replacing the FDR at a particular score $x$ by the minimum TDA FDR in the interval $[-\infty,x]$.
 
 # Example data analysis
 
@@ -184,7 +190,7 @@ glimpse(data_prep)
 The implementation of the all-sub in this packages adopt the target-decoy approach for FDR estimation.
 A subset FDR can be obtained by applying TDA on the subset target and decoy PSMs.
 
-However, in very small subsets with little subset target and decoy PSMs, there can be a large sample-to-sample variability on the FDR estimates. We provide extensions to the basic subset TDA FDR to obtain more stable FDR estimates. Key is the use of a large set of decoy PSMs to reliable estimate the distribution of incorrect target PSM scores. By default we use all decoys from the complete search (subset and non-subset PSMs). 
+However, in very small subsets with little subset target and decoy PSMs, there can be a large sample-to-sample variability on the FDR estimates. We provide extensions to the basic subset TDA FDR to obtain more stable FDR estimates. Key is the use of a large set of decoy PSMs to reliable estimate the distribution of incorrect target PSM scores. By default we use all decoys from the complete search (subset and non-subset PSMs). The user can also define another set of extra decoys and use this for FDR calculation (see [example 2](#example2)).
 
 Bot the classical TDA FDR and our more stable TDA FDR relie on the assumption that the distribution of incorrect target PSM scores can be approximated by the decoy PSM score distribution.
 
@@ -192,6 +198,8 @@ In this package we provide diagnostic plots to verify the assumption that the de
 Tthe 'score_higher' parameter in 'plot_diag()' indicates if higher score values mean a more confident PSM.
 We take the MS-GF+ SpecEValue as the PSM score for FDR calculation and smaller SpecEValue indicate a better match.
 Therefore we have to set the 'score_higher' parameter to 'FALSE'.
+Note that in the manuscript we used $- log ($MS-GF+ SpecEValue$)$ as the score for visualisation purposes.
+Please consult the documentation of your search engine of choice on how to interpret the PSM score.
 
 ```{r, cache= TRUE,fig.width=10, fig.height= 6, out.width= 700}
 diagnostics = plot_diag(data_prep, score_higher = FALSE)
@@ -199,23 +207,26 @@ diagnostics$all
 ```
 **Panel a** shows the posterior distribution of pi_0 given the observed number of target and decoy PSMs in the subset.
 The vertical line indicates the conservative pi_0 estimate used in the calculations.
-At very high pi_0 uncertainty (broad peak), you can also opt to use the BH procedure to minimize sample to sample variability which would mean that pi_0 would be set to 1.
+At very high $\pi_0$ uncertainty (broad peak), you can also opt to use the Benjamine Hochberg procedure to minimize sample to sample variability which would mean that pi_0 would be set to 1 (see **FDR_BH** in the next section).
 However, this will come at the expense of too conservative PSM lists.
 
 The distributional assumption for the decoys can be verified through a PP-plot where the empirical Cumulative Distribution Function (eCDF) of the decoys is plotted against the eCDF of the subset target PSMs.
 The PP-plots in **panel b - d** display the target subset PSMs plotted against all decoy PSMs from the complete search, the decoy subset PSMs plotted against all decoy PSMs from the complete search, and the target subset PSMs plotted against the decoy PSMs from the complete search, respectively.
-The full line in panel **b** and **d** indicates a line with a slope of pi_0.
+The full line in panel **b** and **d** indicates a line with a slope of $\pi_0$.
 The full line in panel **c** indicates the identity line.
-When the distributional assumption holds then the first part of the plot in **b** and **d** should be linear with a slope that equals pi_0.
+When the distributional assumption holds then the first part of the plot in **b** and **d** should be linear with a slope that equals $\pi_0$.
 The second part of the plot deviates from the line towards higher percentiles and will ultimately become vertical (decoy percentile = 1).
 If we see this profile in panel **b**, we have a good indication that the set of decoys from the complete search is representative for the mixture component for incorrect PSMs of the target mixture distribution.
 Deviations from this pattern might be subtle, therefore we provide the PP plots in **c** and **d** to support the conclusion drawn from panel **b**.
 When there is high uncertainty on pi_0 as indicated by **a**, then the linear pattern in the data points might deviate from the drawn solid line, but should still be more or less linear.
 The PP-plot in panel **c**  shows the subset decoy PSMs plotted against all decoy PSMs.
 The whole plot should follow the identity line, indicating that the complete set of decoys is a good representation of the subset decoys.
-To verify that the subset decoys (and thus also the complete set of decoys) are representative for the mixture component for incorrect PSMs of the target mixture distribution, we look at the PP-plot of the subset decoys against the subset targets in panel **d**.
+To verify that the subset decoys are representative for the mixture component for incorrect PSMs of the target mixture distribution, we look at the PP-plot of the subset decoys against the subset targets in panel **d**.
 The profile should look as described for panel **b**.
 If the profile matches in panel **d** but does not for panel **b**, then we suggest to not use the extra decoy set and use only the subset decoys for FDR estimation.
+When the profile does not match in panel **d**, the subset decoys might not be representative for incorrect PSMs. This can indicate that $\pi_0$ is estimated incorrectly, since this is based on the subset PSM scores.
+In this case, the first part of the plot in panel **d** can deviate from the (incorrect) $\pi_0$ slope line.
+But if this first part is linear, it still indicates that the extra set of decoys is representative for the mixture component of incorrect target PSMs. Since $\pi_0$ is unknow in this case we set $\pi_0$ to 1 (see **FDR_BH** in the next section).
 
 We can conclude from the above diagnostic plots that the large decoy set is an appropiate candiate set to estimate the incorrect subset target PSM distribution.
 
@@ -228,9 +239,10 @@ glimpse(data_results)
 ```
 We can choose in the output from three different all-sub FDR estimations:
 The estimated stable FDR at this score cutoff for subset PSMs.
+
 1. FDR: Calculated according the classical TDA method. Does not work well small subsets.
 1. FDR_stable: Our improved FDR method which is more stable in small subsets. For large subsets, *FDR_stable* estimates will be close to **FDR** estimates.
-1. FDR_BH: Use this when you have a large decoy set but no decoy information on the subset PSMs (e.g. when the search engine does not return decoy protien ids). This FDR estimate is more conservative then **FDR** and **FDR_BH**.
+1. FDR_BH: Bejamini Hochberg FDR procedure. Use this when you have a large decoy set but no decoy information on the subset PSMs (e.g. when the search engine does not return decoy protein ids). This FDR estimate is more conservative then **FDR** and **FDR_stable**.
 
 The 'transferase activity' subset is rather small with 104 target and 37 decoy PSMs.
 ```{r, cache= TRUE}
@@ -247,7 +259,9 @@ glimpse(results_1_FDR)
 ```
 At 1\% FDR, we return 31 PSMs.
 
-## sessionInfo()
+# Example 2: Provide an external set of decoys {#example2}
+
+# sessionInfo()
 
 ```{r}
 sessionInfo()
