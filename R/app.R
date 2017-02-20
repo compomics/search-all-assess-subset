@@ -225,8 +225,15 @@ output$plot_theo = renderPlot({
 ##' @keywords internal
 ui = function() fluidPage(
                   navbarPage(
- header = list(tags$a(href = 'https://github.com/compomics/search-all-assess-subset/',
-                 'https://github.com/compomics/search-all-assess-subset/')),
+                    header = list('Source code and offline application: ',
+                                  tags$a(href = 'https://github.com/compomics/search-all-assess-subset/',
+                                         'https://github.com/compomics/search-all-assess-subset/'), tags$br(),
+                                  'Details on FDR procedure:',
+                                  tags$a(href = 'https://git.io/vDdWq',
+                                         'https://git.io/vDdWq'),tags$br(),
+                                  'Bioarxiv preprint: ',
+                                  tags$a(href = 'https://doi.org/10.1101/094581',
+                                         'https://doi.org/10.1101/094581')),
  title =  'Search All, Assess Subset',
   tabPanel('Data input',
            sidebarLayout(
@@ -430,13 +437,12 @@ mainPanel(width = 12,
                                          wellPanel(
                                            fluidRow(column(6, numericInput('decoy_extra_mean', 'mean', 0,step = .1)),
                                                     column(6, numericInput('decoy_extra_sd', 'sd', 0,step = .1))))
-                                         ))
+                                         ),
+                 actionButton("action_simulate", label = "SIMULATE",style = 'font-size:150%'))
                  ,
           column(6,plotOutput('plot_theo'))
           ,
-          fluidRow(
-          actionButton("action_simulate", label = "SIMULATE",style = 'font-size:150%'),
-            column(12,plotOutput('plot_sim_diag')))
+          fluidRow(column(12,plotOutput('plot_sim_diag')))
           )
 ))
 
