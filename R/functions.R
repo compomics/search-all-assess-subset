@@ -161,8 +161,7 @@ calculate_fdr = function(df,score_higher = TRUE) {
     ## conservative pi_0 of subset PSMs with upperbound of 1
     pi_0_cons = (sum(decoy[subset]) + 1) /
       (sum(!decoy[subset])),
-    pi_0_cons = ifelse(pi_0_cons > 1, 1, pi_0_cons)
-  ) %>%
+    pi_0_cons = ifelse(pi_0_cons > 1, 1, pi_0_cons)) %>%
     # Sort the score depending on if higher scores are better or not
     arrange(desc(if (score_higher) score else -score)) %>%
     # Calculate classical FDR on subset
@@ -171,19 +170,23 @@ calculate_fdr = function(df,score_higher = TRUE) {
     # calculate BH FDR on subset
     FDR_BH = (cumsum(decoy) / sum(decoy)) /
              (cumsum(!decoy & subset) / sum(!decoy & subset))) %>%
-    ## Assure FDRs are monotonic
+    ## Assure FDRs are monotonic and does not allow any FDR to be above 1
+    ## Set fdr of decoys and non subset PSMs to NA
+    arrange(if (score_higher) score else -score) %>%
     mutate_at(vars(FDR, FDR_BH),
-              funs(cummax(ifelse(!decoy & subset,.,-Inf)))) %>%
-    # calculate stable FDR on subset
+              funs(ifelse(!decoy & subset,cummin(ifelse(. > 1, 1, .)),NA))) %>%
+    ## calculate stable FDR on subset
     mutate(FDR_stable = FDR_BH * pi_0_cons) %>%
-    ## Does not allow any FDR to be above 1 and set fdr of decoys and non subset PSMs to NA
-    mutate_at(vars(FDR, FDR_BH, FDR_stable),
-              funs(ifelse(!(!decoy & subset), NA,
-                   ifelse(. > 1 , 1, .)))) %>%
     # Put dataframe back in original order
     arrange(index) %>%
     select(-index)
 }
+
+## d = saas::sample_dataset(10000,10000,10000)
+## d = sample_frac(d)
+## d1 = calculate_fdr(d) %>% filter(!decoy)  %>% arrange(score)
+## plot(d1$score,d1$FDR_stable,type = 'l',ylim = c(0,1))
+
 
 #' Creates density plot of the pi0 distribution.
 #'
