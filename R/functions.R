@@ -15,7 +15,7 @@
 #'
 #' ## visualize the pi0 distribution when observing 10 targets and 3 decoys
 #' grid = seq(0,1,.01)
-#' dens = dpi(grid,10 , 3)
+#' dens = dpi0(grid,10 , 3)
 #' plot(dens, xlab = 'pi0', ylab = 'density')
 #' ##Alternatively, you can also use the function pi0plot()
 #' pi0plot(10,3)
