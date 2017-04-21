@@ -2,9 +2,9 @@
 title: "SAAS: Search All, Assess Subset"
 author: "Adriaan Sticker"
 date: "`r Sys.Date()`"
-output: 
+output:
    html_vignette:
-    toc: true  
+    toc: true
     number_sections: true
    fig_caption: yes
 #  pdf_document: default
@@ -57,7 +57,7 @@ and the FDR becomes
 The empirical Bayes/two-groups approach also has the great virtue that independence of the scores is not necessary as long as (1) the estimated CCDF of the marginal distribution is roughly unbiased and (2) the null component is estimated empirically [@Efron2008a].
 
 ## Target-decoy approach
-In a competitive target decoy search, FDRs are estimated by dividing the number of accepted decoys PSMs by the number of accepted target PSMs at a certain MS-GF+ score cutoff [@Elias2007]. 
+In a competitive target decoy search, FDRs are estimated by dividing the number of accepted decoys PSMs by the number of accepted target PSMs at a certain MS-GF+ score cutoff [@Elias2007].
 For FDR estimation in the subset of interest, use only target and decoy PSMs belonging to the subset in the calculation.
 We assure a monotonic increase of FDR estimates with decreasing score values by replacing the FDR at a particular score $x$ by the minimum TDA FDR in the interval $[-\infty,x]$.
 
@@ -76,7 +76,7 @@ So, in a competitive TDA the FDR implicitly relies on the estimator of the propo
 \begin{equation} \hat \pi_0=\frac{\#decoys}{\#targets}.
 \end{equation}
 
-## Stable target-decoy approach for subsets 
+## Stable target-decoy approach for subsets
 In small subsets we typically can expect a low number of decoy PSMs and the $\bar F_0(x)$ will be a poor estimator of $F_0(x)$.
 For improving the stability of the target-decoy approach in small subsets we propose to estimate the mixture component for incorrect PSMs using a large set of decoys with similar properties as the incorrect subset PSMs.
 Hence, the method only relies on the assumption that the incorrect target PSM scores follow the same distribution as the PSM scores of the decoy set.
@@ -111,11 +111,15 @@ Note, that a conservative estimator of the FDR is also available using the link 
 Benjamini and Hochberg, 1995, for instance, included an example with 15 comparisons in their seminal paper [@BenjaminiHochberg1995].
 Also note that their FDR estimator also reduces to a regular p-value in the extreme case that the subset of interest consists of one target PSM, i.e.  we set $\pi_0=1$ and $\bar F=1$ for this extreme edge case.
 
-The ECCDF $\bar F_0(x)$ will be zero for every target PSM with a score higher then the maximum decoy PSM score, inducing an FDR estimate of zero for these target PSMs.
-Decreasing the total number of decoys will lower the maximum decoy PSM score and thus lower the threshold at which the estimated FDR of the target PSMs will be zero.
-This means when only few decoys PSMs are observed, FDR estimates have high sample-to-sample variability and are biased to lower values. \todo{bias zie je in simulatie bij classical FDR}
-FDR estimates are too liberal and underestimates the true FDR.
-Therefore we recommend to have at least 1000 decoys to obtain sufficiently reliable FDR estimates in most situations. 
+The ECCDF $\bar F_0(x)$ is not a good estimator for $F_0(x)$ in small subsets because only a few decoys are available.
+TDA-FDR estimates in small subsets have high sample-to-sample variability and tend to be too liberal.
+Therefore we recommend to have at least 1000 decoys to obtain sufficiently reliable FDR estimates in most situations.
+
+<!-- The ECCDF $\bar F_0(x)$ will be zero for every target PSM with a score higher then the maximum decoy PSM score, inducing an FDR estimate of zero for these target PSMs. -->
+<!-- Decreasing the total number of decoys will lower the maximum decoy PSM score and thus lower the threshold at which the estimated FDR of the target PSMs will be zero. -->
+<!-- This means when only few decoys PSMs are observed, FDR estimates have high sample-to-sample variability and are biased to lower values. -->
+<!-- FDR estimates are too liberal and underestimates the true FDR. -->
+<!-- Therefore we recommend to have at least 1000 decoys to obtain sufficiently reliable FDR estimates in most situations.  -->
 Lastly, we assure a monotonic increase of FDR estimates with decreasing score values by replacing the FDR at a particular score $x$ by the minimum TDA FDR in the interval $[-\infty,x]$.
 
 # Example data analysis
@@ -123,7 +127,7 @@ Lastly, we assure a monotonic increase of FDR estimates with decreasing score va
 ## The data
 In this vignette we use data from a *Pyrocococus furiosis* sample run on a LTQ-Orbitrap Velos mass spectrometer. The data can be found in the PRIDE repository with indentifier PXD001077.
 The *Pyrocococus furiosis* reference proteome fasta file was downloaded from Uniprot on April 22, 2016.
-In this use case we are interested in *Pyrococcus* proteins related to transferase activity as defined by their Gene Ontology identifier (GO:0016740). A fasta file with these proteins was also downloaded from Uniprot. 
+In this use case we are interested in *Pyrococcus* proteins related to transferase activity as defined by their Gene Ontology identifier (GO:0016740). A fasta file with these proteins was also downloaded from Uniprot.
 
 ## Database search
 In theory, the all-sub method can be used on the results from any search engine that report peptide spectrum matches (PSMs) with a score. However, this R package only provides a parser for the MS-GF+ MZident output files. Output from other search engines should be parsed and presented in the format of the output from the 'parse_msgf_mzid()' function (see 'help(saas::parse_msgf_mzid)'in R).
@@ -133,7 +137,7 @@ It's very important that searches are run on a concatenated target-decoy databas
 The *Pyrococcus* dataset was searched against all *Pyrococcus* proteins with the MS-GF+ Search engine (v2016.10.26).
 The MS-GF+ parameter settings used are:
 ```
- -t 10ppm -ti 0,1 -tda 1 -m 3 -inst 1 -e 1 -protocol 0 -ntt 2 -minLength 6 -maxLength 30 
+ -t 10ppm -ti 0,1 -tda 1 -m 3 -inst 1 -e 1 -protocol 0 -ntt 2 -minLength 6 -maxLength 30
  -minCharge 2 -maxCharge 4 -n 1
 ```
 The modification file provide to MS-GF+ is:
@@ -157,7 +161,7 @@ The MS-GF+ MZident output file from this search is included in this package for 
 ## Load the saas library
 library(saas)
 ## Load some convenience functions
-library(dplyr, quietly = TRUE, warn.conflicts = FALSE) 
+library(dplyr, quietly = TRUE, warn.conflicts = FALSE)
 
 ## Location of the zipped data files
 zip_file_path = system.file("extdata", "extdata.zip", package = "saas")
@@ -171,13 +175,13 @@ glimpse(data)
 ```
 ## Preprocessing the MS-GF+ search results.
 By default, the 'preprocess()' function removes all PSMs that assigned to both a decoy and target sequence.
-All rows in the dataframe that belong to the same PSMs (eg. one PSMs that match multiple proteins) are collapsed into one row. 
+All rows in the dataframe that belong to the same PSMs (eg. one PSMs that match multiple proteins) are collapsed into one row.
 
 When a path to a fasta file with the protein_ids from a subset of proteins in the fasta headers is provided, a new column is added that indicates if this PSM belongs to this subset of interest. These protein_ids should match the protein_ids from orginal fasta file used in the MS-GF+ search (and as indicated in the protein_id column in the data frame). This information is needed to use the all-sub method.
 
 Optionally, it's also possible to remove PSM's that can be assigned to multiple proteins.
 ```{r, cache= TRUE}
-## Unzip and get the (temporary) location of the file with fasta headers containing 
+## Unzip and get the (temporary) location of the file with fasta headers containing
 ## the protein_ids from the protein subset of interest.
 fasta_file_path = unzip(zip_file_path, 'transferase_activity_[GO:0016740].fasta', exdir = tempdir())
 
@@ -205,6 +209,7 @@ Please consult the documentation of your search engine of choice on how to inter
 diagnostics = plot_diag(data_prep, score_higher = FALSE)
 diagnostics$all
 ```
+
 **Panel a** shows the posterior distribution of pi_0 given the observed number of target and decoy PSMs in the subset.
 The vertical line indicates the conservative pi_0 estimate used in the calculations.
 At very high $\pi_0$ uncertainty (broad peak), you can also opt to use the Benjamine Hochberg procedure to minimize sample to sample variability which would mean that pi_0 would be set to 1 (see **FDR_BH** in the next section).
@@ -254,15 +259,90 @@ From the diagnostic plots we concluded that the set of decoy PSMs from the compl
 So, in this case it's recommended to use the more stable FDR estimates in **FDR_stable**.
 
 ```{r, cache= TRUE}
-results_1_FDR = filter(data_results, subset, !decoy, FDR_stable >= .01) 
+results_1_FDR = filter(data_results, subset, !decoy, FDR_stable <= .01)
 glimpse(results_1_FDR)
 ```
 At 1\% FDR, we return 31 PSMs.
 
-# Example 2: Provide an external set of decoys {#example2}
+# Example 2: Using an external set of decoys {#example2}
+In the previous example, we used scores from all decoys generated by the database search to obtain more stable FDR estimates when only few decoys are available in the subset of interest.
+Sometimes there are still not enough decoys available from the complete search or the PP plots showed that they do not estimate the distribution of incorrect target PSMs very well.
+However, it's still possible to stabilize FDR estimation in a small subset if you obtain a set of decoys PSMs from somewhere else (eg. another experiment).
+
+## The data
+For demonstration purposes we will simulate two datasets using the `sample_dataset()` functon.
+The first dataset contains 35 PSMs: 5 correct subset target PSMs, 10 incorrect subset target PSMs, 10 subset decoy PSMs and 10 non-subset decoy PSMs.
+The non-subset decoy PSMs, however, are biased towards lower score values.
+The second dataset contains 2000 decoys PSMs that are sampled from the same distribution as the decoy and incorrect target subset PSMs from dataset 1.
+We create a third dataset were we remove the non-subset decoys and add the decoys from dataset 2.
+
+```{r, cache= TRUE}
+## Load the saas library
+library(saas)
+## Load some convenience functions
+library(dplyr, quietly = TRUE, warn.conflicts = FALSE)
+
+set.seed(10)
+## dataset 1
+H0_mean = 2.75
+data_1 = sample_dataset(H0_n = 20, decoy_n = 20, H1_n = 10, decoy_large_n = 2000,
+                        H0_mean = H0_mean, decoy_large_mean = H0_mean - .1)
+
+## dataset 2
+data_2 = sample_dataset(H0_n = 100, decoy_n = 100, H1_n = 50, decoy_large_n = 1900)
+
+## dataset 3 with the subset PSMs from dataset 1 and the decoy PSMs from dataset 2
+### select all subset PSMs from dataset 1
+data_1_filtered = filter(data_1, subset)
+### select all decoys from dataset 2
+data_2_filtered = filter(data_2,decoy)
+### make sure they are labeled as non-subset decoys
+data_2_filtered = mutate(data_2_filtered, subset = FALSE)
+### add them to the subset decoys of dataset 1
+data_3 = bind_rows(data_1_filtered, data_2_filtered)
+```
+
+## Evaluating the decoy PSM distribution.
+We evaluate in dataset 1 the assumption that the distribution of incorrect target PSM scores can be approximated by the decoy PSM score distribution with diagnostic plots.
+
+```{r, cache= TRUE,fig.width=10, fig.height= 6, out.width= 700}
+diagnostics = plot_diag(data_1)
+diagnostics$all
+```
+
+The PP plot in panel **b** shows clear deviation from the $\pi_0$ line.
+This suggests that the complete set of decoy PSM scores are a bad approximation of the incorrect target PSM score distribution.
+
+The PP plot in panel **d** shows a profile that follows closely the $\pi_0$ line.
+This suggests that the subset decoys PSMs scores are a good approximation of the incorrect target PSM score distribution.
+But since we only have 20 subset decoy PSMs, we can expect large sample-to-sample variability in the FDR estimation.
+
+Therefore we use a larger set of decoys derived from another dataset.
+We evaluate again in this exetended dataset (dataset 3) the assumption that the distribution of incorrect target PSM scores can be approximated by the decoy PSM score distribution.
+
+```{r, cache= TRUE,fig.width=10, fig.height= 6, out.width= 700}
+diagnostics = plot_diag(data_3)
+diagnostics$all
+```
+
+Now, the PP plot in panel **b** shows a profile that follows closely the $\pi_0$ line.
+We can safely assume that the complete set of decoy PSM scores are a good approximation of the incorrect target PSM score distribution.
+
+## Estimating FDR on the subset of interest.
+Since we have a very small subset, we again recommended to use the more stable FDR estimates in **FDR_stable** exploiting the information in the larger set of decoy PSMs.
+
+```{r, cache= TRUE}
+data_results = calculate_fdr(data_3)
+results_1_FDR = filter(data_results, subset, !decoy, FDR_stable <= .01)
+glimpse(results_1_FDR)
+```
+At 1\% FDR, we return 9 PSMs.
+Note that none of the returned PSMs where sampled out of the incorrect target distribution ($H_0$).
 
 # sessionInfo()
 
 ```{r}
 sessionInfo()
 ```
+
+# References

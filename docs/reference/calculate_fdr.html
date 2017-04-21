@@ -54,7 +54,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li>
-  <a href="../articles/index.html">Articles</a>
+  <a href="../articles/saas.html">Tutorial</a>
 </li>
       </ul>
       
@@ -122,24 +122,23 @@ When provided, non-subset decoy PSMs are used to stabilize estimates in small su
 <span class='co'>## Simulate a dataset with 140 correct target subset PSMs, 60 incorrect target subset PSMS,</span>
 <span class='co'>## 60 decoy subset PSMs and 2000 additional decoy PSMs.</span>
 <span class='fu'>set.seed</span>(<span class='fl'>10</span>)
-<span class='no'>d</span> <span class='kw'>=</span> <span class='fu'><a href='sample_dataset.html'>sample_dataset</a></span>(<span class='kw'>H1_n</span> <span class='kw'>=</span> <span class='fl'>140</span>,<span class='kw'>H0_n</span> <span class='kw'>=</span> <span class='fl'>60</span>, <span class='kw'>decoy_n</span> <span class='kw'>=</span> <span class='fl'>60</span> ,<span class='kw'>decoy_large_n</span> <span class='kw'>=</span> <span class='fl'>2000</span>,
-                   <span class='kw'>H0_mean</span> <span class='kw'>=</span> <span class='fl'>2.7</span>, <span class='kw'>H1_mean</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>decoy_mean</span> <span class='kw'>=</span> <span class='fl'>2.7</span>, <span class='kw'>decoy_large_mean</span> <span class='kw'>=</span> <span class='fl'>2.7</span>)
+<span class='no'>d</span> <span class='kw'>=</span> <span class='fu'><a href='sample_dataset.html'>sample_dataset</a></span>(<span class='kw'>H1_n</span> <span class='kw'>=</span> <span class='fl'>140</span>,<span class='kw'>H0_n</span> <span class='kw'>=</span> <span class='fl'>60</span>, <span class='kw'>decoy_n</span> <span class='kw'>=</span> <span class='fl'>60</span> ,<span class='kw'>decoy_large_n</span> <span class='kw'>=</span> <span class='fl'>2000</span>)
 
 <span class='co'>## calculate the qvalues in the subset target PSMS according the classical target-decoy approach</span>
 <span class='co'>## and our more stable estimation method.</span>
 <span class='fu'>calculate_fdr</span>(<span class='no'>d</span>)</div><div class='output co'>#&gt; # A tibble: 2,260 x 8
 #&gt;       score decoy    H0 subset pi_0_cons   FDR FDR_BH FDR_stable
 #&gt;       &lt;dbl&gt; &lt;lgl&gt; &lt;lgl&gt;  &lt;lgl&gt;     &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;
-#&gt; 1  2.702437  TRUE FALSE  FALSE     0.305    NA     NA         NA
-#&gt; 2  2.676047  TRUE FALSE  FALSE     0.305    NA     NA         NA
-#&gt; 3  2.521727  TRUE FALSE  FALSE     0.305    NA     NA         NA
-#&gt; 4  2.622108  TRUE FALSE  FALSE     0.305    NA     NA         NA
-#&gt; 5  2.738291  TRUE FALSE  FALSE     0.305    NA     NA         NA
-#&gt; 6  2.750673  TRUE FALSE  FALSE     0.305    NA     NA         NA
-#&gt; 7  2.542950  TRUE FALSE  FALSE     0.305    NA     NA         NA
-#&gt; 8  2.652722  TRUE FALSE  FALSE     0.305    NA     NA         NA
-#&gt; 9  2.488533  TRUE FALSE  FALSE     0.305    NA     NA         NA
-#&gt; 10 2.666658  TRUE FALSE  FALSE     0.305    NA     NA         NA
+#&gt; 1  2.752437  TRUE FALSE  FALSE     0.305    NA     NA         NA
+#&gt; 2  2.726047  TRUE FALSE  FALSE     0.305    NA     NA         NA
+#&gt; 3  2.571727  TRUE FALSE  FALSE     0.305    NA     NA         NA
+#&gt; 4  2.672108  TRUE FALSE  FALSE     0.305    NA     NA         NA
+#&gt; 5  2.788291  TRUE FALSE  FALSE     0.305    NA     NA         NA
+#&gt; 6  2.800673  TRUE FALSE  FALSE     0.305    NA     NA         NA
+#&gt; 7  2.592950  TRUE FALSE  FALSE     0.305    NA     NA         NA
+#&gt; 8  2.702722  TRUE FALSE  FALSE     0.305    NA     NA         NA
+#&gt; 9  2.538533  TRUE FALSE  FALSE     0.305    NA     NA         NA
+#&gt; 10 2.716658  TRUE FALSE  FALSE     0.305    NA     NA         NA
 #&gt; # ... with 2,250 more rows</div><div class='input'>
 </div></pre>
   </div>

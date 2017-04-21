@@ -1,0 +1,11 @@
+navbar:
+  title: ~
+  type: default
+  left:
+  - text: Reference
+    href: reference/index.html
+  - text: Vignette
+    href: articles/saas.html
+  right:
+  - icon: fa-github fa-lg
+    href: https://github.com/compomics/search-all-assess-subset

@@ -34,8 +34,7 @@ Creates PP plot of two empirical distributions.
 ## Simulate a dataset with 140 correct target subset PSMs, 60 incorrect target subset PSMS,
 ## 60 decoy subset PSMs and 2000 additional decoy PSMs.
 set.seed(10)
-d = sample_dataset(H1_n = 140,H0_n = 60, decoy_n = 60 ,decoy_large_n = 2000,
-                   H0_mean = 2.7, H1_mean = 3, decoy_mean = 2.7, decoy_large_mean = 2.7)
+d = sample_dataset(H1_n = 140,H0_n = 60, decoy_n = 60 ,decoy_large_n = 2000)
 
 ##pi_0 can be estimated with the target-decoy approach
 pi0 = sum(d$decoy & d$subset)/sum(!d$decoy & d$subset)

@@ -32,7 +32,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li>
-  <a href="../articles/index.html">Articles</a>
+  <a href="../articles/saas.html">Tutorial</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
@@ -142,7 +142,13 @@ The mixture proportion <span class="math inline">\(\pi_0\)</span> can still be e
 \widehat{\text{FDR}}(x)=\frac{\bar F_0(x)}{\bar F(x)}.
 \end{equation}\]</span>
 <p>In very small subsets, the latter FDR estimator is still valid as long as a good estimator of the mixture component for incorrect PSMs is available. Benjamini and Hochberg, 1995, for instance, included an example with 15 comparisons in their seminal paper <span class="citation">(Benjamini and Hochberg 1995)</span>. Also note that their FDR estimator also reduces to a regular p-value in the extreme case that the subset of interest consists of one target PSM, i.e. we set <span class="math inline">\(\pi_0=1\)</span> and <span class="math inline">\(\bar F=1\)</span> for this extreme edge case.</p>
-<p>The ECCDF <span class="math inline">\(\bar F_0(x)\)</span> will be zero for every target PSM with a score higher then the maximum decoy PSM score, inducing an FDR estimate of zero for these target PSMs. Decreasing the total number of decoys will lower the maximum decoy PSM score and thus lower the threshold at which the estimated FDR of the target PSMs will be zero. This means when only few decoys PSMs are observed, FDR estimates have high sample-to-sample variability and are biased to lower values.  FDR estimates are too liberal and underestimates the true FDR. Therefore we recommend to have at least 1000 decoys to obtain sufficiently reliable FDR estimates in most situations. Lastly, we assure a monotonic increase of FDR estimates with decreasing score values by replacing the FDR at a particular score <span class="math inline">\(x\)</span> by the minimum TDA FDR in the interval <span class="math inline">\([-\infty,x]\)</span>.</p>
+<p>The ECCDF <span class="math inline">\(\bar F_0(x)\)</span> is not a good estimator for <span class="math inline">\(F_0(x)\)</span> in small subsets because only a few decoys are available. TDA-FDR estimates in small subsets have high sample-to-sample variability and tend to be too liberal. Therefore we recommend to have at least 1000 decoys to obtain sufficiently reliable FDR estimates in most situations.</p>
+<!-- The ECCDF $\bar F_0(x)$ will be zero for every target PSM with a score higher then the maximum decoy PSM score, inducing an FDR estimate of zero for these target PSMs. -->
+<!-- Decreasing the total number of decoys will lower the maximum decoy PSM score and thus lower the threshold at which the estimated FDR of the target PSMs will be zero. -->
+<!-- This means when only few decoys PSMs are observed, FDR estimates have high sample-to-sample variability and are biased to lower values. -->
+<!-- FDR estimates are too liberal and underestimates the true FDR. -->
+<!-- Therefore we recommend to have at least 1000 decoys to obtain sufficiently reliable FDR estimates in most situations.  -->
+<p>Lastly, we assure a monotonic increase of FDR estimates with decreasing score values by replacing the FDR at a particular score <span class="math inline">\(x\)</span> by the minimum TDA FDR in the interval <span class="math inline">\([-\infty,x]\)</span>.</p>
 </div>
 </div>
 <div id="example-data-analysis" class="section level1">
@@ -158,7 +164,7 @@ The mixture proportion <span class="math inline">\(\pi_0\)</span> can still be e
 <a href="#database-search" class="anchor"></a>Database search</h2>
 <p>In theory, the all-sub method can be used on the results from any search engine that report peptide spectrum matches (PSMs) with a score. However, this R package only provides a parser for the MS-GF+ MZident output files. Output from other search engines should be parsed and presented in the format of the output from the ‘parse_msgf_mzid()’ function (see ‘help(saas::parse_msgf_mzid)’in R). It should be realtively straightforward to adapt the code from ’parse_msgf_mzid()’ to work with other search engines. It’s very important that searches are run on a concatenated target-decoy database.</p>
 <p>The <em>Pyrococcus</em> dataset was searched against all <em>Pyrococcus</em> proteins with the MS-GF+ Search engine (v2016.10.26). The MS-GF+ parameter settings used are:</p>
-<pre><code> -t 10ppm -ti 0,1 -tda 1 -m 3 -inst 1 -e 1 -protocol 0 -ntt 2 -minLength 6 -maxLength 30 
+<pre><code> -t 10ppm -ti 0,1 -tda 1 -m 3 -inst 1 -e 1 -protocol 0 -ntt 2 -minLength 6 -maxLength 30
  -minCharge 2 -maxCharge 4 -n 1</code></pre>
 <p>The modification file provide to MS-GF+ is:</p>
 <pre><code>NumMods=2
@@ -177,7 +183,7 @@ H1O3P1,STY,opt,any,Phospho
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Load the saas library
 <span class="kw">library</span>(saas)
 ## Load some convenience functions
-<span class="kw">library</span>(dplyr, <span class="dt">quietly =</span> <span class="ot">TRUE</span>, <span class="dt">warn.conflicts =</span> <span class="ot">FALSE</span>) 
+<span class="kw">library</span>(dplyr, <span class="dt">quietly =</span> <span class="ot">TRUE</span>, <span class="dt">warn.conflicts =</span> <span class="ot">FALSE</span>)
 
 ## Location of the zipped data files
 zip_file_path =<span class="st"> </span><span class="kw">system.file</span>(<span class="st">"extdata"</span>, <span class="st">"extdata.zip"</span>, <span class="dt">package =</span> <span class="st">"saas"</span>)
@@ -204,7 +210,7 @@ data =<span class="st"> </span><span class="kw"><a href="../reference/parse_msgf
 <p>By default, the ‘preprocess()’ function removes all PSMs that assigned to both a decoy and target sequence. All rows in the dataframe that belong to the same PSMs (eg. one PSMs that match multiple proteins) are collapsed into one row.</p>
 <p>When a path to a fasta file with the protein_ids from a subset of proteins in the fasta headers is provided, a new column is added that indicates if this PSM belongs to this subset of interest. These protein_ids should match the protein_ids from orginal fasta file used in the MS-GF+ search (and as indicated in the protein_id column in the data frame). This information is needed to use the all-sub method.</p>
 <p>Optionally, it’s also possible to remove PSM’s that can be assigned to multiple proteins.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Unzip and get the (temporary) location of the file with fasta headers containing 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Unzip and get the (temporary) location of the file with fasta headers containing
 ## the protein_ids from the protein subset of interest.
 fasta_file_path =<span class="st"> </span><span class="kw">unzip</span>(zip_file_path, <span class="st">'transferase_activity_[GO:0016740].fasta'</span>, <span class="dt">exdir =</span> <span class="kw">tempdir</span>())
 
@@ -233,7 +239,8 @@ data_prep =<span class="st"> </span><span class="kw"><a href="../reference/prepr
 <p>In this package we provide diagnostic plots to verify the assumption that the decoy PSM score distribution follows the incorrect target PSM distribution. Tthe ‘score_higher’ parameter in ‘plot_diag()’ indicates if higher score values mean a more confident PSM. We take the MS-GF+ SpecEValue as the PSM score for FDR calculation and smaller SpecEValue indicate a better match. Therefore we have to set the ‘score_higher’ parameter to ‘FALSE’. Note that in the manuscript we used <span class="math inline">\(- log (\)</span>MS-GF+ SpecEValue<span class="math inline">\()\)</span> as the score for visualisation purposes. Please consult the documentation of your search engine of choice on how to interpret the PSM score.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">diagnostics =<span class="st"> </span><span class="kw"><a href="../reference/plot_diag.html">plot_diag</a></span>(data_prep, <span class="dt">score_higher =</span> <span class="ot">FALSE</span>)
 diagnostics<span class="op">$</span>all</code></pre></div>
-<p><img src="saas_files/figure-html/unnamed-chunk-3-1.png" width="700"><strong>Panel a</strong> shows the posterior distribution of pi_0 given the observed number of target and decoy PSMs in the subset. The vertical line indicates the conservative pi_0 estimate used in the calculations. At very high <span class="math inline">\(\pi_0\)</span> uncertainty (broad peak), you can also opt to use the Benjamine Hochberg procedure to minimize sample to sample variability which would mean that pi_0 would be set to 1 (see <strong>FDR_BH</strong> in the next section). However, this will come at the expense of too conservative PSM lists.</p>
+<p><img src="saas_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
+<p><strong>Panel a</strong> shows the posterior distribution of pi_0 given the observed number of target and decoy PSMs in the subset. The vertical line indicates the conservative pi_0 estimate used in the calculations. At very high <span class="math inline">\(\pi_0\)</span> uncertainty (broad peak), you can also opt to use the Benjamine Hochberg procedure to minimize sample to sample variability which would mean that pi_0 would be set to 1 (see <strong>FDR_BH</strong> in the next section). However, this will come at the expense of too conservative PSM lists.</p>
 <p>The distributional assumption for the decoys can be verified through a PP-plot where the empirical Cumulative Distribution Function (eCDF) of the decoys is plotted against the eCDF of the subset target PSMs. The PP-plots in <strong>panel b - d</strong> display the target subset PSMs plotted against all decoy PSMs from the complete search, the decoy subset PSMs plotted against all decoy PSMs from the complete search, and the target subset PSMs plotted against the decoy PSMs from the complete search, respectively. The full line in panel <strong>b</strong> and <strong>d</strong> indicates a line with a slope of <span class="math inline">\(\pi_0\)</span>. The full line in panel <strong>c</strong> indicates the identity line. When the distributional assumption holds then the first part of the plot in <strong>b</strong> and <strong>d</strong> should be linear with a slope that equals <span class="math inline">\(\pi_0\)</span>. The second part of the plot deviates from the line towards higher percentiles and will ultimately become vertical (decoy percentile = 1). If we see this profile in panel <strong>b</strong>, we have a good indication that the set of decoys from the complete search is representative for the mixture component for incorrect PSMs of the target mixture distribution. Deviations from this pattern might be subtle, therefore we provide the PP plots in <strong>c</strong> and <strong>d</strong> to support the conclusion drawn from panel <strong>b</strong>. When there is high uncertainty on pi_0 as indicated by <strong>a</strong>, then the linear pattern in the data points might deviate from the drawn solid line, but should still be more or less linear. The PP-plot in panel <strong>c</strong> shows the subset decoy PSMs plotted against all decoy PSMs. The whole plot should follow the identity line, indicating that the complete set of decoys is a good representation of the subset decoys. To verify that the subset decoys are representative for the mixture component for incorrect PSMs of the target mixture distribution, we look at the PP-plot of the subset decoys against the subset targets in panel <strong>d</strong>. The profile should look as described for panel <strong>b</strong>. If the profile matches in panel <strong>d</strong> but does not for panel <strong>b</strong>, then we suggest to not use the extra decoy set and use only the subset decoys for FDR estimation. When the profile does not match in panel <strong>d</strong>, the subset decoys might not be representative for incorrect PSMs. This can indicate that <span class="math inline">\(\pi_0\)</span> is estimated incorrectly, since this is based on the subset PSM scores. In this case, the first part of the plot in panel <strong>d</strong> can deviate from the (incorrect) <span class="math inline">\(\pi_0\)</span> slope line. But if this first part is linear, it still indicates that the extra set of decoys is representative for the mixture component of incorrect target PSMs. Since <span class="math inline">\(\pi_0\)</span> is unknow in this case we set <span class="math inline">\(\pi_0\)</span> to 1 (see <strong>FDR_BH</strong> in the next section).</p>
 <p>We can conclude from the above diagnostic plots that the large decoy set is an appropiate candiate set to estimate the incorrect subset target PSM distribution.</p>
 </div>
@@ -277,29 +284,92 @@ diagnostics<span class="op">$</span>all</code></pre></div>
 ## 4   TRUE  TRUE    37</code></pre>
 <p>From the diagnostic plots we concluded that the set of decoy PSMs from the complete search is a good candidate set to approximate the incorrect target PSM distribution.</p>
 <p>So, in this case it’s recommended to use the more stable FDR estimates in <strong>FDR_stable</strong>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">results_1_FDR =<span class="st"> </span><span class="kw">filter</span>(data_results, subset, <span class="op">!</span>decoy, FDR_stable <span class="op">&gt;=</span><span class="st"> </span>.<span class="dv">01</span>) 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">results_1_FDR =<span class="st"> </span><span class="kw">filter</span>(data_results, subset, <span class="op">!</span>decoy, FDR_stable <span class="op">&lt;=</span><span class="st"> </span>.<span class="dv">01</span>)
 <span class="kw">glimpse</span>(results_1_FDR)</code></pre></div>
-<pre><code>## Observations: 31
+<pre><code>## Observations: 73
 ## Variables: 13
-## $ spec_id       &lt;dbl&gt; 85, 1361, 3519, 6026, 6857, 7516, 8462, 8490, 95...
-## $ sequence      &lt;chr&gt; "YKGRGFRK", "KLGENNER", "FGTFLLTILTK", "YKFKNNYR...
+## $ spec_id       &lt;dbl&gt; 273, 409, 412, 439, 521, 1109, 1201, 1527, 1531,...
+## $ sequence      &lt;chr&gt; "IKKEDYQR", "KKYEEYR", "KKYEEYR", "ILHDEDKEGTK",...
 ## $ decoy         &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,...
 ## $ database      &lt;chr&gt; "complete", "complete", "complete", "complete", ...
 ## $ database_size &lt;dbl&gt; 2051, 2051, 2051, 2051, 2051, 2051, 2051, 2051, ...
-## $ score         &lt;dbl&gt; 5.231224e-05, 3.140562e-05, 7.486767e-06, 4.2052...
+## $ score         &lt;dbl&gt; 7.725776e-09, 7.241932e-10, 7.455879e-10, 2.2812...
 ## $ subset        &lt;lgl&gt; TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, ...
 ## $ non_subset    &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,...
-## $ protein_id    &lt;chr&gt; "Q8U164|Glycosyl", "Q8U4L8|6,7-dimethyl-8-ribity...
+## $ protein_id    &lt;chr&gt; "Q8U2R4|Acetyl", "Q8TH05|O-linked", "Q8TH05|O-li...
 ## $ pi_0_cons     &lt;dbl&gt; 0.3653846, 0.3653846, 0.3653846, 0.3653846, 0.36...
-## $ FDR           &lt;dbl&gt; 0.23333333, 0.17441860, 0.07317073, 0.21348315, ...
-## $ FDR_BH        &lt;dbl&gt; 0.63759109, 0.52501418, 0.21983740, 0.59408666, ...
-## $ FDR_stable    &lt;dbl&gt; 0.23296597, 0.19183210, 0.08032520, 0.21707013, ...</code></pre>
+## $ FDR           &lt;dbl&gt; 0.00000000, 0.00000000, 0.00000000, 0.00000000, ...
+## $ FDR_BH        &lt;dbl&gt; 0.0016578989, 0.0000000000, 0.0000000000, 0.0000...
+## $ FDR_stable    &lt;dbl&gt; 0.0006057708, 0.0000000000, 0.0000000000, 0.0000...</code></pre>
 <p>At 1% FDR, we return 31 PSMs.</p>
 </div>
 </div>
 <div id="example2" class="section level1">
 <h1 class="hasAnchor">
-<a href="#example2" class="anchor"></a>Example 2: Provide an external set of decoys</h1>
+<a href="#example2" class="anchor"></a>Example 2: Using an external set of decoys</h1>
+<p>In the previous example, we used scores from all decoys generated by the database search to obtain more stable FDR estimates when only few decoys are available in the subset of interest. Sometimes there are still not enough decoys available from the complete search or the PP plots showed that they do not estimate the distribution of incorrect target PSMs very well. However, it’s still possible to stabilize FDR estimation in a small subset if you obtain a set of decoys PSMs from somewhere else (eg. another experiment).</p>
+<div id="the-data-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#the-data-1" class="anchor"></a>The data</h2>
+<p>For demonstration purposes we will simulate two datasets using the <code><a href="../reference/sample_dataset.html">sample_dataset()</a></code> functon. The first dataset contains 35 PSMs: 5 correct subset target PSMs, 10 incorrect subset target PSMs, 10 subset decoy PSMs and 10 non-subset decoy PSMs. The non-subset decoy PSMs, however, are biased towards lower score values. The second dataset contains 2000 decoys PSMs that are sampled from the same distribution as the decoy and incorrect target subset PSMs from dataset 1. We create a third dataset were we remove the non-subset decoys and add the decoys from dataset 2.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Load the saas library
+<span class="kw">library</span>(saas)
+## Load some convenience functions
+<span class="kw">library</span>(dplyr, <span class="dt">quietly =</span> <span class="ot">TRUE</span>, <span class="dt">warn.conflicts =</span> <span class="ot">FALSE</span>)
+
+<span class="kw">set.seed</span>(<span class="dv">10</span>)
+## dataset 1
+H0_mean =<span class="st"> </span><span class="fl">2.75</span>
+data_<span class="dv">1</span> =<span class="st"> </span><span class="kw"><a href="../reference/sample_dataset.html">sample_dataset</a></span>(<span class="dt">H0_n =</span> <span class="dv">20</span>, <span class="dt">decoy_n =</span> <span class="dv">20</span>, <span class="dt">H1_n =</span> <span class="dv">10</span>, <span class="dt">decoy_large_n =</span> <span class="dv">2000</span>,
+                        <span class="dt">H0_mean =</span> H0_mean, <span class="dt">decoy_large_mean =</span> H0_mean <span class="op">-</span><span class="st"> </span>.<span class="dv">1</span>)
+
+## dataset 2
+data_<span class="dv">2</span> =<span class="st"> </span><span class="kw"><a href="../reference/sample_dataset.html">sample_dataset</a></span>(<span class="dt">H0_n =</span> <span class="dv">100</span>, <span class="dt">decoy_n =</span> <span class="dv">100</span>, <span class="dt">H1_n =</span> <span class="dv">50</span>, <span class="dt">decoy_large_n =</span> <span class="dv">1900</span>)
+
+## dataset 3 with the subset PSMs from dataset 1 and the decoy PSMs from dataset 2
+### select all subset PSMs from dataset 1
+data_1_filtered =<span class="st"> </span><span class="kw">filter</span>(data_<span class="dv">1</span>, subset)
+### select all decoys from dataset 2
+data_2_filtered =<span class="st"> </span><span class="kw">filter</span>(data_<span class="dv">2</span>,decoy)
+### make sure they are labeled as non-subset decoys
+data_2_filtered =<span class="st"> </span><span class="kw">mutate</span>(data_2_filtered, <span class="dt">subset =</span> <span class="ot">FALSE</span>)
+### add them to the subset decoys of dataset 1
+data_<span class="dv">3</span> =<span class="st"> </span><span class="kw">bind_rows</span>(data_1_filtered, data_2_filtered)</code></pre></div>
+</div>
+<div id="evaluating-the-decoy-psm-distribution--1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#evaluating-the-decoy-psm-distribution--1" class="anchor"></a>Evaluating the decoy PSM distribution.</h2>
+<p>We evaluate in dataset 1 the assumption that the distribution of incorrect target PSM scores can be approximated by the decoy PSM score distribution with diagnostic plots.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">diagnostics =<span class="st"> </span><span class="kw"><a href="../reference/plot_diag.html">plot_diag</a></span>(data_<span class="dv">1</span>)
+diagnostics<span class="op">$</span>all</code></pre></div>
+<p><img src="saas_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<p>The PP plot in panel <strong>b</strong> shows clear deviation from the <span class="math inline">\(\pi_0\)</span> line. This suggests that the complete set of decoy PSM scores are a bad approximation of the incorrect target PSM score distribution.</p>
+<p>The PP plot in panel <strong>d</strong> shows a profile that follows closely the <span class="math inline">\(\pi_0\)</span> line. This suggests that the subset decoys PSMs scores are a good approximation of the incorrect target PSM score distribution. But since we only have 20 subset decoy PSMs, we can expect large sample-to-sample variability in the FDR estimation.</p>
+<p>Therefore we use a larger set of decoys derived from another dataset. We evaluate again in this exetended dataset (dataset 3) the assumption that the distribution of incorrect target PSM scores can be approximated by the decoy PSM score distribution.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">diagnostics =<span class="st"> </span><span class="kw"><a href="../reference/plot_diag.html">plot_diag</a></span>(data_<span class="dv">3</span>)
+diagnostics<span class="op">$</span>all</code></pre></div>
+<p><img src="saas_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
+<p>Now, the PP plot in panel <strong>b</strong> shows a profile that follows closely the <span class="math inline">\(\pi_0\)</span> line. We can safely assume that the complete set of decoy PSM scores are a good approximation of the incorrect target PSM score distribution.</p>
+</div>
+<div id="estimating-fdr-on-the-subset-of-interest--1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#estimating-fdr-on-the-subset-of-interest--1" class="anchor"></a>Estimating FDR on the subset of interest.</h2>
+<p>Since we have a very small subset, we again recommended to use the more stable FDR estimates in <strong>FDR_stable</strong> exploiting the information in the larger set of decoy PSMs.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data_results =<span class="st"> </span><span class="kw"><a href="../reference/calculate_fdr.html">calculate_fdr</a></span>(data_<span class="dv">3</span>)
+results_1_FDR =<span class="st"> </span><span class="kw">filter</span>(data_results, subset, <span class="op">!</span>decoy, FDR_stable <span class="op">&lt;=</span><span class="st"> </span>.<span class="dv">01</span>)
+<span class="kw">glimpse</span>(results_1_FDR)</code></pre></div>
+<pre><code>## Observations: 9
+## Variables: 8
+## $ score      &lt;dbl&gt; 3.271756, 3.553800, 3.532864, 3.200799, 3.137270, 3...
+## $ decoy      &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FA...
+## $ H0         &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FA...
+## $ subset     &lt;lgl&gt; TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE
+## $ pi_0_cons  &lt;dbl&gt; 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7
+## $ FDR        &lt;dbl&gt; 0.0, 0.0, 0.0, 0.1, 0.1, 0.0, 0.0, 0.0, 0.0
+## $ FDR_BH     &lt;dbl&gt; 0.000000000, 0.000000000, 0.000000000, 0.003712871,...
+## $ FDR_stable &lt;dbl&gt; 0.000000000, 0.000000000, 0.000000000, 0.002599010,...</code></pre>
+<p>At 1% FDR, we return 9 PSMs. Note that none of the returned PSMs where sampled out of the incorrect target distribution (<span class="math inline">\(H_0\)</span>).</p>
+</div>
 </div>
 <div id="sessioninfo" class="section level1">
 <h1 class="hasAnchor">
@@ -315,24 +385,16 @@ diagnostics<span class="op">$</span>all</code></pre></div>
 ## attached base packages:
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
-## other attached packages:
-## [1] dplyr_0.5.0     saas_0.0.0.9000
-## 
 ## loaded via a namespace (and not attached):
-##  [1] Rcpp_0.12.10        plyr_1.8.4          ProtGenerics_1.6.0 
-##  [4] tools_3.3.3         digest_0.6.12       evaluate_0.10      
-##  [7] tibble_1.3.0        gtable_0.2.0        shiny_1.0.0        
-## [10] DBI_0.6             yaml_2.1.14         parallel_3.3.3     
-## [13] stringr_1.2.0       knitr_1.15.1        hms_0.3            
-## [16] rprojroot_1.2       grid_3.3.3          cowplot_0.7.0      
-## [19] Biobase_2.34.0      R6_2.2.0            rmarkdown_1.4      
-## [22] ggplot2_2.2.1       readr_1.1.0         mzR_2.8.0          
-## [25] magrittr_1.5        backports_1.0.5     scales_0.4.1       
-## [28] codetools_0.2-15    htmltools_0.3.5     BiocGenerics_0.20.0
-## [31] assertthat_0.2.0    mime_0.5            colorspace_1.3-2   
-## [34] xtable_1.8-2        httpuv_1.3.3        labeling_0.3       
-## [37] stringi_1.1.5       lazyeval_0.2.0.9000 munsell_0.4.3      
-## [40] markdown_0.7.7</code></pre>
+##  [1] backports_1.0.5      magrittr_1.5         rprojroot_1.2       
+##  [4] tools_3.3.3          htmltools_0.3.5      yaml_2.1.14         
+##  [7] Rcpp_0.12.10         stringi_1.1.5        rmarkdown_1.4.0.9001
+## [10] knitr_1.15.1         stringr_1.2.0        digest_0.6.12       
+## [13] evaluate_0.10</code></pre>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1 class="hasAnchor">
+<a href="#references" class="anchor"></a>References</h1>
 <div id="refs" class="references">
 <div id="ref-BenjaminiHochberg1995">
 <p>Benjamini, Yoav, and Yosef Hochberg. 1995. “Controlling the False Discovery Rate: A Practical and Powerful Approach to Multiple Testing.” <em>Journal of the Royal Statistical Society: Series B</em> 57 (1). Blackwell Publishing for the Royal Statistical Society: 289–300.</p>
@@ -372,8 +434,15 @@ diagnostics<span class="op">$</span>all</code></pre></div>
       <li><a href="#estimating-fdr-on-the-subset-of-interest.">Estimating FDR on the subset of interest.</a></li>
       </ul>
 </li>
-      <li><a href="#example2">Example 2: Provide an external set of decoys</a></li>
+      <li>
+<a href="#example2">Example 2: Using an external set of decoys</a><ul class="nav nav-pills nav-stacked">
+<li><a href="#the-data-1">The data</a></li>
+      <li><a href="#evaluating-the-decoy-psm-distribution.-1">Evaluating the decoy PSM distribution.</a></li>
+      <li><a href="#estimating-fdr-on-the-subset-of-interest.-1">Estimating FDR on the subset of interest.</a></li>
+      </ul>
+</li>
       <li><a href="#sessioninfo">sessionInfo()</a></li>
+      <li><a href="#references">References</a></li>
       </ul>
 </div>
       </div>

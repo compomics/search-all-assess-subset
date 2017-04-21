@@ -144,8 +144,7 @@ simulate_subset = function(n ,pi0 ,sims = 1){
 #' ## Simulate a dataset with 140 correct target subset PSMs, 60 incorrect target subset PSMS,
 #' ## 60 decoy subset PSMs and 2000 additional decoy PSMs.
 #' set.seed(10)
-#' d = sample_dataset(H1_n = 140,H0_n = 60, decoy_n = 60 ,decoy_large_n = 2000,
-#'                    H0_mean = 2.7, H1_mean = 3, decoy_mean = 2.7, decoy_large_mean = 2.7)
+#' d = sample_dataset(H1_n = 140,H0_n = 60, decoy_n = 60 ,decoy_large_n = 2000)
 #'
 #' ## calculate the qvalues in the subset target PSMS according the classical target-decoy approach
 #' ## and our more stable estimation method.
@@ -203,7 +202,8 @@ calculate_fdr = function(df,score_higher = TRUE) {
 #' @examples
 #'
 #' ## Visualize the pi0 distribution when observing 10 targets and 3 decoys
-#' ## pi0plot(10,3)
+#' set.seed(10)
+#' pi0plot(10,3)
 #'
  pi0plot = function(n_targets, n_decoys, conservative_pi0 =  TRUE) {
   grid = seq(0, 1, .001)
@@ -250,8 +250,7 @@ calculate_fdr = function(df,score_higher = TRUE) {
 #' ## Simulate a dataset with 140 correct target subset PSMs, 60 incorrect target subset PSMS,
 #' ## 60 decoy subset PSMs and 2000 additional decoy PSMs.
 #' set.seed(10)
-#' d = sample_dataset(H1_n = 140,H0_n = 60, decoy_n = 60 ,decoy_large_n = 2000,
-#'                    H0_mean = 2.7, H1_mean = 3, decoy_mean = 2.7, decoy_large_mean = 2.7)
+#' d = sample_dataset(H1_n = 140,H0_n = 60, decoy_n = 60 ,decoy_large_n = 2000)
 #'
 #' ##pi_0 can be estimated with the target-decoy approach
 #' pi0 = sum(d$decoy & d$subset)/sum(!d$decoy & d$subset)

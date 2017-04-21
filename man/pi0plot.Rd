@@ -23,6 +23,7 @@ This estimate is used in our more stable FDR estimation in the subset PSMs of in
 \examples{
 
 ## Visualize the pi0 distribution when observing 10 targets and 3 decoys
-## pi0plot(10,3)
+set.seed(10)
+pi0plot(10,3)
 
 }

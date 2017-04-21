@@ -7,7 +7,8 @@ A preprint of the manuscript on the search-all-assess FDR procedure can be found
 
 A user-friendly GUI version of saas is hosted [here](http://iomics.ugent.be/saas/).
 
-More information on the FDR estimation procedure for subsets and the usage of the SAAS package can be found in the [vignette](http://htmlpreview.github.io/?https://github.com/compomics/search-all-assess-subset/blob/master/vignettes/saas.html).
+More information on the FDR estimation procedure for subsets and the usage of the SAAS package can be found in the [vignette](./docs/articles/saas.html)
+<!-- (http://htmlpreview.github.io/?https://github.com/compomics/search-all-assess-subset/blob/master/vignettes/saas.html). -->
 
 ## Installation
 

@@ -24,6 +24,6 @@ Suggests:
     mzR (>= 2.8.0),
     knitr,
     rmarkdown
-RoxygenNote: 6.0.0
+RoxygenNote: 6.0.1
 VignetteBuilder: knitr
 Roxygen: list(markdown = FALSE)
