@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Introduction</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+<!-- Styles for R syntax highlighter -->
+<style type="text/css">
+   pre .operator,
+   pre .paren {
+     color: rgb(104, 118, 135)
+   }
+
+   pre .literal {
+     color: #990073
+   }
+
+   pre .number {
+     color: #099;
+   }
+
+   pre .comment {
+     color: #998;
+     font-style: italic
+   }
+
+   pre .keyword {
+     color: #900;
+     font-weight: bold
+   }
+
+   pre .identifier {
+     color: rgb(0, 0, 0);
+   }
+
+   pre .string {
+     color: #d14;
+   }
+</style>
+
+<!-- R syntax highlighter -->
+<script type="text/javascript">
+var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/</gm,"&lt;")}function f(r,q,p){return RegExp(q,"m"+(r.cI?"i":"")+(p?"g":""))}function b(r){for(var p=0;p<r.childNodes.length;p++){var q=r.childNodes[p];if(q.nodeName=="CODE"){return q}if(!(q.nodeType==3&&q.nodeValue.match(/\s+/))){break}}}function h(t,s){var p="";for(var r=0;r<t.childNodes.length;r++){if(t.childNodes[r].nodeType==3){var q=t.childNodes[r].nodeValue;if(s){q=q.replace(/\n/g,"")}p+=q}else{if(t.childNodes[r].nodeName=="BR"){p+="\n"}else{p+=h(t.childNodes[r])}}}if(/MSIE [678]/.test(navigator.userAgent)){p=p.replace(/\r/g,"\n")}return p}function a(s){var r=s.className.split(/\s+/);r=r.concat(s.parentNode.className.split(/\s+/));for(var q=0;q<r.length;q++){var p=r[q].replace(/^language-/,"");if(e[p]){return p}}}function c(q){var p=[];(function(s,t){for(var r=0;r<s.childNodes.length;r++){if(s.childNodes[r].nodeType==3){t+=s.childNodes[r].nodeValue.length}else{if(s.childNodes[r].nodeName=="BR"){t+=1}else{if(s.childNodes[r].nodeType==1){p.push({event:"start",offset:t,node:s.childNodes[r]});t=arguments.callee(s.childNodes[r],t);p.push({event:"stop",offset:t,node:s.childNodes[r]})}}}}return t})(q,0);return p}function k(y,w,x){var q=0;var z="";var s=[];function u(){if(y.length&&w.length){if(y[0].offset!=w[0].offset){return(y[0].offset<w[0].offset)?y:w}else{return w[0].event=="start"?y:w}}else{return y.length?y:w}}function t(D){var A="<"+D.nodeName.toLowerCase();for(var B=0;B<D.attributes.length;B++){var C=D.attributes[B];A+=" "+C.nodeName.toLowerCase();if(C.value!==undefined&&C.value!==false&&C.value!==null){A+='="'+m(C.value)+'"'}}return A+">"}while(y.length||w.length){var v=u().splice(0,1)[0];z+=m(x.substr(q,v.offset-q));q=v.offset;if(v.event=="start"){z+=t(v.node);s.push(v.node)}else{if(v.event=="stop"){var p,r=s.length;do{r--;p=s[r];z+=("</"+p.nodeName.toLowerCase()+">")}while(p!=v.node);s.splice(r,1);while(r<s.length){z+=t(s[r]);r++}}}}return z+m(x.substr(q))}function j(){function q(x,y,v){if(x.compiled){return}var u;var s=[];if(x.k){x.lR=f(y,x.l||hljs.IR,true);for(var w in x.k){if(!x.k.hasOwnProperty(w)){continue}if(x.k[w] instanceof Object){u=x.k[w]}else{u=x.k;w="keyword"}for(var r in u){if(!u.hasOwnProperty(r)){continue}x.k[r]=[w,u[r]];s.push(r)}}}if(!v){if(x.bWK){x.b="\\b("+s.join("|")+")\\s"}x.bR=f(y,x.b?x.b:"\\B|\\b");if(!x.e&&!x.eW){x.e="\\B|\\b"}if(x.e){x.eR=f(y,x.e)}}if(x.i){x.iR=f(y,x.i)}if(x.r===undefined){x.r=1}if(!x.c){x.c=[]}x.compiled=true;for(var t=0;t<x.c.length;t++){if(x.c[t]=="self"){x.c[t]=x}q(x.c[t],y,false)}if(x.starts){q(x.starts,y,false)}}for(var p in e){if(!e.hasOwnProperty(p)){continue}q(e[p].dM,e[p],true)}}function d(B,C){if(!j.called){j();j.called=true}function q(r,M){for(var L=0;L<M.c.length;L++){if((M.c[L].bR.exec(r)||[null])[0]==r){return M.c[L]}}}function v(L,r){if(D[L].e&&D[L].eR.test(r)){return 1}if(D[L].eW){var M=v(L-1,r);return M?M+1:0}return 0}function w(r,L){return L.i&&L.iR.test(r)}function K(N,O){var M=[];for(var L=0;L<N.c.length;L++){M.push(N.c[L].b)}var r=D.length-1;do{if(D[r].e){M.push(D[r].e)}r--}while(D[r+1].eW);if(N.i){M.push(N.i)}return f(O,M.join("|"),true)}function p(M,L){var N=D[D.length-1];if(!N.t){N.t=K(N,E)}N.t.lastIndex=L;var r=N.t.exec(M);return r?[M.substr(L,r.index-L),r[0],false]:[M.substr(L),"",true]}function z(N,r){var L=E.cI?r[0].toLowerCase():r[0];var M=N.k[L];if(M&&M instanceof Array){return M}return false}function F(L,P){L=m(L);if(!P.k){return L}var r="";var O=0;P.lR.lastIndex=0;var M=P.lR.exec(L);while(M){r+=L.substr(O,M.index-O);var N=z(P,M);if(N){x+=N[1];r+='<span class="'+N[0]+'">'+M[0]+"</span>"}else{r+=M[0]}O=P.lR.lastIndex;M=P.lR.exec(L)}return r+L.substr(O,L.length-O)}function J(L,M){if(M.sL&&e[M.sL]){var r=d(M.sL,L);x+=r.keyword_count;return r.value}else{return F(L,M)}}function I(M,r){var L=M.cN?'<span class="'+M.cN+'">':"";if(M.rB){y+=L;M.buffer=""}else{if(M.eB){y+=m(r)+L;M.buffer=""}else{y+=L;M.buffer=r}}D.push(M);A+=M.r}function G(N,M,Q){var R=D[D.length-1];if(Q){y+=J(R.buffer+N,R);return false}var P=q(M,R);if(P){y+=J(R.buffer+N,R);I(P,M);return P.rB}var L=v(D.length-1,M);if(L){var O=R.cN?"</span>":"";if(R.rE){y+=J(R.buffer+N,R)+O}else{if(R.eE){y+=J(R.buffer+N,R)+O+m(M)}else{y+=J(R.buffer+N+M,R)+O}}while(L>1){O=D[D.length-2].cN?"</span>":"";y+=O;L--;D.length--}var r=D[D.length-1];D.length--;D[D.length-1].buffer="";if(r.starts){I(r.starts,"")}return R.rE}if(w(M,R)){throw"Illegal"}}var E=e[B];var D=[E.dM];var A=0;var x=0;var y="";try{var s,u=0;E.dM.buffer="";do{s=p(C,u);var t=G(s[0],s[1],s[2]);u+=s[0].length;if(!t){u+=s[1].length}}while(!s[2]);if(D.length>1){throw"Illegal"}return{r:A,keyword_count:x,value:y}}catch(H){if(H=="Illegal"){return{r:0,keyword_count:0,value:m(C)}}else{throw H}}}function g(t){var p={keyword_count:0,r:0,value:m(t)};var r=p;for(var q in e){if(!e.hasOwnProperty(q)){continue}var s=d(q,t);s.language=q;if(s.keyword_count+s.r>r.keyword_count+r.r){r=s}if(s.keyword_count+s.r>p.keyword_count+p.r){r=p;p=s}}if(r.language){p.second_best=r}return p}function i(r,q,p){if(q){r=r.replace(/^((<[^>]+>|\t)+)/gm,function(t,w,v,u){return w.replace(/\t/g,q)})}if(p){r=r.replace(/\n/g,"<br>")}return r}function n(t,w,r){var x=h(t,r);var v=a(t);var y,s;if(v){y=d(v,x)}else{return}var q=c(t);if(q.length){s=document.createElement("pre");s.innerHTML=y.value;y.value=k(q,c(s),x)}y.value=i(y.value,w,r);var u=t.className;if(!u.match("(\\s|^)(language-)?"+v+"(\\s|$)")){u=u?(u+" "+v):v}if(/MSIE [678]/.test(navigator.userAgent)&&t.tagName=="CODE"&&t.parentNode.tagName=="PRE"){s=t.parentNode;var p=document.createElement("div");p.innerHTML="<pre><code>"+y.value+"</code></pre>";t=p.firstChild.firstChild;p.firstChild.cN=s.cN;s.parentNode.replaceChild(p.firstChild,s)}else{t.innerHTML=y.value}t.className=u;t.result={language:v,kw:y.keyword_count,re:y.r};if(y.second_best){t.second_best={language:y.second_best.language,kw:y.second_best.keyword_count,re:y.second_best.r}}}function o(){if(o.called){return}o.called=true;var r=document.getElementsByTagName("pre");for(var p=0;p<r.length;p++){var q=b(r[p]);if(q){n(q,hljs.tabReplace)}}}function l(){if(window.addEventListener){window.addEventListener("DOMContentLoaded",o,false);window.addEventListener("load",o,false)}else{if(window.attachEvent){window.attachEvent("onload",o)}else{window.onload=o}}}var e={};this.LANGUAGES=e;this.highlight=d;this.highlightAuto=g;this.fixMarkup=i;this.highlightBlock=n;this.initHighlighting=o;this.initHighlightingOnLoad=l;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="\\b(0[xX][a-fA-F0-9]+|(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|\\.|-|-=|/|/=|:|;|<|<<|<<=|<=|=|==|===|>|>=|>>|>>=|>>>|>>>=|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.ER="(?![\\s\\S])";this.BE={b:"\\\\.",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE],r:0};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE],r:0};this.CLCM={cN:"comment",b:"//",e:"$"};this.CBLCLM={cN:"comment",b:"/\\*",e:"\\*/"};this.HCM={cN:"comment",b:"#",e:"$"};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.inherit=function(r,s){var p={};for(var q in r){p[q]=r[q]}if(s){for(var q in s){p[q]=s[q]}}return p}}();hljs.LANGUAGES.cpp=function(){var a={keyword:{"false":1,"int":1,"float":1,"while":1,"private":1,"char":1,"catch":1,"export":1,virtual:1,operator:2,sizeof:2,dynamic_cast:2,typedef:2,const_cast:2,"const":1,struct:1,"for":1,static_cast:2,union:1,namespace:1,unsigned:1,"long":1,"throw":1,"volatile":2,"static":1,"protected":1,bool:1,template:1,mutable:1,"if":1,"public":1,friend:2,"do":1,"return":1,"goto":1,auto:1,"void":2,"enum":1,"else":1,"break":1,"new":1,extern:1,using:1,"true":1,"class":1,asm:1,"case":1,typeid:1,"short":1,reinterpret_cast:2,"default":1,"double":1,register:1,explicit:1,signed:1,typename:1,"try":1,"this":1,"switch":1,"continue":1,wchar_t:1,inline:1,"delete":1,alignof:1,char16_t:1,char32_t:1,constexpr:1,decltype:1,noexcept:1,nullptr:1,static_assert:1,thread_local:1,restrict:1,_Bool:1,complex:1},built_in:{std:1,string:1,cin:1,cout:1,cerr:1,clog:1,stringstream:1,istringstream:1,ostringstream:1,auto_ptr:1,deque:1,list:1,queue:1,stack:1,vector:1,map:1,set:1,bitset:1,multiset:1,multimap:1,unordered_set:1,unordered_map:1,unordered_multiset:1,unordered_multimap:1,array:1,shared_ptr:1}};return{dM:{k:a,i:"</",c:[hljs.CLCM,hljs.CBLCLM,hljs.QSM,{cN:"string",b:"'\\\\?.",e:"'",i:"."},{cN:"number",b:"\\b(\\d+(\\.\\d*)?|\\.\\d+)(u|U|l|L|ul|UL|f|F)"},hljs.CNM,{cN:"preprocessor",b:"#",e:"$"},{cN:"stl_container",b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:a,r:10,c:["self"]}]}}}();hljs.LANGUAGES.r={dM:{c:[hljs.HCM,{cN:"number",b:"\\b0[xX][0-9a-fA-F]+[Li]?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+(?:[eE][+\\-]?\\d*)?L\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+\\.(?!\\d)(?:i\\b)?",e:hljs.IMMEDIATE_RE,r:1},{cN:"number",b:"\\b\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"keyword",b:"(?:tryCatch|library|setGeneric|setGroupGeneric)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\.",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\d+(?![\\w.])",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\b(?:function)",e:hljs.IMMEDIATE_RE,r:2},{cN:"keyword",b:"(?:if|in|break|next|repeat|else|for|return|switch|while|try|stop|warning|require|attach|detach|source|setMethod|setClass)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"literal",b:"(?:NA|NA_integer_|NA_real_|NA_character_|NA_complex_)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"literal",b:"(?:NULL|TRUE|FALSE|T|F|Inf|NaN)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"identifier",b:"[a-zA-Z.][a-zA-Z0-9._]*\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"<\\-(?!\\s*\\d)",e:hljs.IMMEDIATE_RE,r:2},{cN:"operator",b:"\\->|<\\-",e:hljs.IMMEDIATE_RE,r:1},{cN:"operator",b:"%%|~",e:hljs.IMMEDIATE_RE},{cN:"operator",b:">=|<=|==|!=|\\|\\||&&|=|\\+|\\-|\\*|/|\\^|>|<|!|&|\\||\\$|:",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"%",e:"%",i:"\\n",r:1},{cN:"identifier",b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[hljs.BE],r:0},{cN:"string",b:"'",e:"'",c:[hljs.BE],r:0},{cN:"paren",b:"[[({\\])}]",e:hljs.IMMEDIATE_RE,r:0}]}};
+hljs.initHighlightingOnLoad();
+</script>
+
+<!-- MathJax scripts -->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>Introduction</h1>
+
+<p>In this vignette we will demonstrate how to use the &#39;search all, asses subset&#39; strategy (all-sub) to correctly calculated the FDR on a PSM subset of interest in a shotgun proteomic experiment.</p>
+
+<p>In short, the basic all-sub workflow comprises the following steps:</p>
+
+<ol>
+<li>Search the experimental MS2 spectra against all proteins potentially present in the sample.</li>
+<li>Remove all PSMs that match a protein you are not interesed in.</li>
+<li>Calculate the FDR on the resulting subset of PSMs.</li>
+</ol>
+
+<p>A preprint of the manuscript on the search-all-assess FDR procedure can be found on bioRxiv (<a href="https://doi.org/10.1101/094581">https://doi.org/10.1101/094581</a>).</p>
+
+<blockquote>
+<p>Mass spectrometrists should search for all peptides, but assess only the ones they care about<br/>
+Adriaan Sticker, Lieven Clement, Lennart Martens [-@Sticker2017]</p>
+</blockquote>
+
+<h2>False discovery rate (FDR) estimation</h2>
+
+<p>Let \(x\) be the PSM score and assume that larger score values indicate a better match to the theoretical spectrum.
+The FDR is known to have a Bayesian interpretation upon defining a mixture model for the distribution of \(x\) [@Efron2008a].
+\begin{equation}
+f(x) = \pi_0 f_0(x) + (1-\pi_0) f_1(x),
+\end{equation}
+with \(f(x)\) the target distribution of the test statistic, \(f_0(x)\) the mixture component corresponding to incorrect PSMs, \(f_1(x)\) the mixture component corresponding to the correct PSMs and \(\pi_0\) the fraction of incorrect PSMs.</p>
+
+<p>Based on the mixture distribution the FDR can be defined as the posterior probability
+\begin{equation}
+\text{FDR}(x) = Pr[\text{PSM is incorrect}\vert X\geq x].
+\end{equation}
+Let \(F(x)\), \(F_0(x)\) and \(F_1(x)\) indicate the complementary cumulative distribution function (CCDF)
+\begin{equation}
+F<em>{.}(x)=\int\limits</em>{X=x}<sup>{+\infty}</sup> f_{.}(X) dx
+\end{equation}
+so
+\begin{equation}
+F(x)= \pi_0 F_0(x) + (1-\pi_0) F_1(x)
+\end{equation}
+and the FDR becomes
+\begin{equation}
+\text{FDR}(x)=\frac{\pi_0 F_0(x) }{F(x)}
+\end{equation}</p>
+
+<p>The empirical Bayes/two-groups approach also has the great virtue that independence of the scores is not necessary as long as (1) the estimated CCDF of the marginal distribution is roughly unbiased and (2) the null component is estimated empirically [@Efron2008a].</p>
+
+<h2>Target-decoy approach</h2>
+
+<p>In a competitive target decoy search, FDRs are estimated by dividing the number of accepted decoys PSMs by the number of accepted target PSMs at a certain MS-GF+ score cutoff [@Elias2007]. 
+For FDR estimation in the subset of interest, use only target and decoy PSMs belonging to the subset in the calculation.
+We assure a monotonic increase of FDR estimates with decreasing score values by replacing the FDR at a particular score \(x\) by the minimum TDA FDR in the interval \([-\infty,x]\).</p>
+
+<p>Note, that in a competitive target decoy search the FDR with TDA is estimated by
+\begin{equation}
+\widehat{\text{FDR}}(x) =\frac{# decoys | X\geq x}{# targets | X\geq x},
+\end{equation}
+which can be rewritten as
+\small
+\begin{eqnarray<em>}
+\widehat{\text{FDR}}(x) &amp;=&amp;\frac{\frac{#decoys}{#targets}\frac{# decoys | X\geq x}{# decoys}}{\frac{# targets | X\geq x}{# targets}}\
+&amp;=&amp;\frac{\hat \pi_0 \bar F_0(x)}{\bar F(x)}
+\end{eqnarray</em>}
+with \(\bar F_0(x)\) and \(\bar F(x)\) the empirical complementary cumulative distribution functions (ECCDFs) estimated using decoy and target PSMs, respectively.
+So, in a competitive TDA the FDR implicitly relies on the estimator of the proportion of incorrect PSMs among the targets
+\begin{equation} \hat \pi_0=\frac{#decoys}{#targets}.
+\end{equation}</p>
+
+<h2>Stable target-decoy approach for subsets</h2>
+
+<p>In small subsets we typically can expect a low number of decoy PSMs and the \(\bar F_0(x)\) will be a poor estimator of \(F_0(x)\).
+For improving the stability of the target-decoy approach in small subsets we propose to estimate the mixture component for incorrect PSMs using a large set of decoys with similar properties as the incorrect subset PSMs.
+Hence, the method only relies on the assumption that the incorrect target PSM scores follow the same distribution as the PSM scores of the decoy set.</p>
+
+<p>This large set of decoys PSM scores can be designed by the user.
+However often, the set of decoys in the complete search seems a good candidate set.
+This allows for the estimation of the mixture component of the incorrect PSMs and the marginal distribution of all PSMs non-parametrically, i.e. based on the ECCDFs \(\bar F_0(x)\) using a large decoy set (e.g. of the complete search) and \(\bar F(x)\) derived from the targets in the subset, respectively.</p>
+
+<p>The mixture proportion \(\pi_0\) can still be estimated based on the ratio of the number of decoys on the number of targets in the subset upon a competitive target decoy search.
+However, the estimator \(\hat \pi_0\) often becomes zero in very small subsets, inducing an FDR estimate of zero for the set of all subset target PSMs.
+We therefore propose to use the estimator
+\begin{equation}
+    \hat \pi<em>0=
+\begin{cases}
+  \frac{#\text{decoys}</em>\text{subset}+1}{#\text{targets}<em>\text{subset}}, &amp;
+  \text{if}\ #\text{targets} &gt; #\text{decoys}\
+  1, &amp;
+  \text{if}\ #\text{targets} \leq #\text{decoys}\
+\end{cases}
+  ,
+\end{equation}
+which has a lower bound of $\frac{1}{\text{targets}</em>\text{subset}}$ and an upper bound of 1.
+Note that this estimator has an upward bias in small subsets, which disappears for moderate to large subsets.
+In the extreme case that we observe only one target PSM, \(\hat \pi_0\) is 1 and the FDR estimator reduces to a regular p-value.</p>
+
+<p>Note, that a conservative estimator of the FDR is also available using the link between the Bayesian and the Benjamini-Hochberg (BH) FDR procedure, i.e. by setting the mixture proportion of the mixture component for incorrect PSMs to \(\pi_0=1\) [@Efron2008a].</p>
+
+<p>\begin{equation}
+\widehat{\text{FDR}}(x)=\frac{\bar F_0(x)}{\bar F(x)}.
+\end{equation}
+ In very small subsets, the latter FDR estimator is still valid as long as a good estimator of the mixture component for incorrect PSMs is available.
+Benjamini and Hochberg, 1995, for instance, included an example with 15 comparisons in their seminal paper [@BenjaminiHochberg1995].
+Also note that their FDR estimator also reduces to a regular p-value in the extreme case that the subset of interest consists of one target PSM, i.e.  we set \(\pi_0=1\) and \(\bar F=1\) for this extreme edge case.</p>
+
+<p>The ECCDF \(\bar F_0(x)\) will be zero for every target PSM with a score higher then the maximum decoy PSM score, inducing an FDR estimate of zero for these target PSMs.
+Decreasing the total number of decoys will lower the maximum decoy PSM score and thus lower the threshold at which the estimated FDR of the target PSMs will be zero.
+This means when only few decoys PSMs are observed, FDR estimates have high sample-to-sample variability and are biased to lower values. \todo{bias zie je in simulatie bij classical FDR}
+FDR estimates are too liberal and underestimates the true FDR.
+Therefore we recommend to have at least 1000 decoys to obtain sufficiently reliable FDR estimates in most situations. 
+Lastly, we assure a monotonic increase of FDR estimates with decreasing score values by replacing the FDR at a particular score \(x\) by the minimum TDA FDR in the interval \([-\infty,x]\).</p>
+
+<h1>Example data analysis</h1>
+
+<h2>The data</h2>
+
+<p>In this vignette we use data from a <em>Pyrocococus furiosis</em> sample run on a LTQ-Orbitrap Velos mass spectrometer. The data can be found in the PRIDE repository with indentifier PXD001077.
+The <em>Pyrocococus furiosis</em> reference proteome fasta file was downloaded from Uniprot on April 22, 2016.
+In this use case we are interested in <em>Pyrococcus</em> proteins related to transferase activity as defined by their Gene Ontology identifier (GO:0016740). A fasta file with these proteins was also downloaded from Uniprot. </p>
+
+<h2>Database search</h2>
+
+<p>In theory, the all-sub method can be used on the results from any search engine that report peptide spectrum matches (PSMs) with a score. However, this R package only provides a parser for the MS-GF+ MZident output files. Output from other search engines should be parsed and presented in the format of the output from the &#39;parse_msgf_mzid()&#39; function (see &#39;help(saas::parse_msgf_mzid)&#39;in R).
+It should be realtively straightforward to adapt the code from &#39;parse_msgf_mzid()&#39; to work with other search engines.
+It&#39;s very important that searches are run on a concatenated target-decoy database.</p>
+
+<p>The <em>Pyrococcus</em> dataset was searched against all <em>Pyrococcus</em> proteins with the MS-GF+ Search engine (v2016.10.26).
+The MS-GF+ parameter settings used are:</p>
+
+<pre><code> -t 10ppm -ti 0,1 -tda 1 -m 3 -inst 1 -e 1 -protocol 0 -ntt 2 -minLength 6 -maxLength 30 
+ -minCharge 2 -maxCharge 4 -n 1
+</code></pre>
+
+<p>The modification file provide to MS-GF+ is:</p>
+
+<pre><code>NumMods=2
+
+57.021464,C,fix,any,Carbamidomethyl
+15.994915,M,opt,any,Oxidation
+H1O3P1,STY,opt,any,Phospho
+
+</code></pre>
+
+<p>For an explanation on how to use MS-GF+ and an explanation on all parameter settings, please read the MS-GF+ documentation at:</p>
+
+<p><a href="https://omics.pnl.gov/software/ms-gf">https://omics.pnl.gov/software/ms-gf</a></p>
+
+<p>The MS-GF+ MZident output file from this search is included in this package for use in subsequent analysis steps.</p>
+
+<h2>Reading a MS-GF+ MZident output file.</h2>
+
+<pre><code class="r">## Load the saas library
+library(saas)
+## Load some convenience functions
+library(dplyr, quietly = TRUE, warn.conflicts = FALSE) 
+
+## Location of the zipped data files
+zip_file_path = system.file(&quot;extdata&quot;, &quot;extdata.zip&quot;, package = &quot;saas&quot;)
+## Unzip and get the (temporary) location of the mzid file with the MS-GF+ search results.
+mzid_file_path = unzip(zip_file_path, &#39;pyrococcus.mzid&#39;,exdir = tempdir())
+
+## Read and parse the mzid file
+data = parse_msgf_mzid(mzid_file_path)
+
+glimpse(data)
+</code></pre>
+
+<pre><code>## Observations: 15,639
+## Variables: 7
+## $ spec_id       &lt;dbl&gt; 9834, 10918, 12207, 12179, 11387, 11027, 7833, 9...
+## $ sequence      &lt;chr&gt; &quot;GLEVSGYNCYIYPAMALAYGTSAIGAHHK&quot;, &quot;MLVDSLGDIVITND...
+## $ protein_id    &lt;chr&gt; &quot;Q8U1K3|Formaldehyde:ferredoxin&quot;, &quot;Q8TZL6|Thermo...
+## $ score         &lt;dbl&gt; 2.383677e-34, 6.238274e-32, 2.329653e-31, 1.0498...
+## $ database      &lt;chr&gt; &quot;complete&quot;, &quot;complete&quot;, &quot;complete&quot;, &quot;complete&quot;, ...
+## $ decoy         &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,...
+## $ database_size &lt;dbl&gt; 2051, 2051, 2051, 2051, 2051, 2051, 2051, 2051, ...
+</code></pre>
+
+<h2>Preprocessing the MS-GF+ search results.</h2>
+
+<p>By default, the &#39;preprocess()&#39; function removes all PSMs that assigned to both a decoy and target sequence.
+All rows in the dataframe that belong to the same PSMs (eg. one PSMs that match multiple proteins) are collapsed into one row. </p>
+
+<p>When a path to a fasta file with the protein_ids from a subset of proteins in the fasta headers is provided, a new column is added that indicates if this PSM belongs to this subset of interest. These protein_ids should match the protein_ids from orginal fasta file used in the MS-GF+ search (and as indicated in the protein_id column in the data frame). This information is needed to use the all-sub method.</p>
+
+<p>Optionally, it&#39;s also possible to remove PSM&#39;s that can be assigned to multiple proteins.</p>
+
+<pre><code class="r">## Unzip and get the (temporary) location of the file with fasta headers containing 
+## the protein_ids from the protein subset of interest.
+fasta_file_path = unzip(zip_file_path, &#39;transferase_activity_[GO:0016740].fasta&#39;, exdir = tempdir())
+
+## Preprocess the data.
+data_prep = preprocess(data, is_subset = fasta_file_path)
+
+glimpse(data_prep)
+</code></pre>
+
+<pre><code>## Observations: 15,107
+## Variables: 9
+## $ spec_id       &lt;dbl&gt; 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14...
+## $ sequence      &lt;chr&gt; &quot;YEQIPWTQECSK&quot;, &quot;NVQQKWFGK&quot;, &quot;NLLESPKIK&quot;, &quot;KHLEQ...
+## $ decoy         &lt;lgl&gt; FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, TRUE, FA...
+## $ database      &lt;chr&gt; &quot;complete&quot;, &quot;complete&quot;, &quot;complete&quot;, &quot;complete&quot;, ...
+## $ database_size &lt;dbl&gt; 2051, 2051, 2051, 2051, 2051, 2051, 2051, 2051, ...
+## $ score         &lt;dbl&gt; 2.560707e-05, 1.458271e-04, 9.241630e-06, 1.7355...
+## $ subset        &lt;lgl&gt; FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, ...
+## $ non_subset    &lt;lgl&gt; TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,...
+## $ protein_id    &lt;chr&gt; &quot;Q8U285|Uncharacterized&quot;, &quot;Q8U168|Glycosyl&quot;, &quot;P8...
+</code></pre>
+
+<h2>Evaluating the decoy PSM distribution.</h2>
+
+<p>The implementation of the all-sub in this packages adopt the target-decoy approach for FDR estimation.
+A subset FDR can be obtained by applying TDA on the subset target and decoy PSMs.</p>
+
+<p>However, in very small subsets with little subset target and decoy PSMs, there can be a large sample-to-sample variability on the FDR estimates. We provide extensions to the basic subset TDA FDR to obtain more stable FDR estimates. Key is the use of a large set of decoy PSMs to reliable estimate the distribution of incorrect target PSM scores. By default we use all decoys from the complete search (subset and non-subset PSMs). The user can also define another set of extra decoys and use this for FDR calculation (see <a href="#example2">example 2</a>).</p>
+
+<p>Bot the classical TDA FDR and our more stable TDA FDR relie on the assumption that the distribution of incorrect target PSM scores can be approximated by the decoy PSM score distribution.</p>
+
+<p>In this package we provide diagnostic plots to verify the assumption that the decoy PSM score distribution follows the incorrect target PSM distribution.
+Tthe &#39;score_higher&#39; parameter in &#39;plot_diag()&#39; indicates if higher score values mean a more confident PSM.
+We take the MS-GF+ SpecEValue as the PSM score for FDR calculation and smaller SpecEValue indicate a better match.
+Therefore we have to set the &#39;score_higher&#39; parameter to &#39;FALSE&#39;.
+Note that in the manuscript we used $- log (\(MS-GF+ SpecEValue\))$ as the score for visualisation purposes.
+Please consult the documentation of your search engine of choice on how to interpret the PSM score.</p>
+
+<pre><code class="r">diagnostics = plot_diag(data_prep, score_higher = FALSE)
+diagnostics$all
+</code></pre>
+
+<p><img src="data:image/png;base64,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" title="plot of chunk unnamed-chunk-3" alt="plot of chunk unnamed-chunk-3" width="700" />
+<strong>Panel a</strong> shows the posterior distribution of pi_0 given the observed number of target and decoy PSMs in the subset.
+The vertical line indicates the conservative pi_0 estimate used in the calculations.
+At very high \(\pi_0\) uncertainty (broad peak), you can also opt to use the Benjamine Hochberg procedure to minimize sample to sample variability which would mean that pi_0 would be set to 1 (see <strong>FDR_BH</strong> in the next section).
+However, this will come at the expense of too conservative PSM lists.</p>
+
+<p>The distributional assumption for the decoys can be verified through a PP-plot where the empirical Cumulative Distribution Function (eCDF) of the decoys is plotted against the eCDF of the subset target PSMs.
+The PP-plots in <strong>panel b - d</strong> display the target subset PSMs plotted against all decoy PSMs from the complete search, the decoy subset PSMs plotted against all decoy PSMs from the complete search, and the target subset PSMs plotted against the decoy PSMs from the complete search, respectively.
+The full line in panel <strong>b</strong> and <strong>d</strong> indicates a line with a slope of \(\pi_0\).
+The full line in panel <strong>c</strong> indicates the identity line.
+When the distributional assumption holds then the first part of the plot in <strong>b</strong> and <strong>d</strong> should be linear with a slope that equals \(\pi_0\).
+The second part of the plot deviates from the line towards higher percentiles and will ultimately become vertical (decoy percentile = 1).
+If we see this profile in panel <strong>b</strong>, we have a good indication that the set of decoys from the complete search is representative for the mixture component for incorrect PSMs of the target mixture distribution.
+Deviations from this pattern might be subtle, therefore we provide the PP plots in <strong>c</strong> and <strong>d</strong> to support the conclusion drawn from panel <strong>b</strong>.
+When there is high uncertainty on pi_0 as indicated by <strong>a</strong>, then the linear pattern in the data points might deviate from the drawn solid line, but should still be more or less linear.
+The PP-plot in panel <strong>c</strong>  shows the subset decoy PSMs plotted against all decoy PSMs.
+The whole plot should follow the identity line, indicating that the complete set of decoys is a good representation of the subset decoys.
+To verify that the subset decoys are representative for the mixture component for incorrect PSMs of the target mixture distribution, we look at the PP-plot of the subset decoys against the subset targets in panel <strong>d</strong>.
+The profile should look as described for panel <strong>b</strong>.
+If the profile matches in panel <strong>d</strong> but does not for panel <strong>b</strong>, then we suggest to not use the extra decoy set and use only the subset decoys for FDR estimation.
+When the profile does not match in panel <strong>d</strong>, the subset decoys might not be representative for incorrect PSMs. This can indicate that \(\pi_0\) is estimated incorrectly, since this is based on the subset PSM scores.
+In this case, the first part of the plot in panel <strong>d</strong> can deviate from the (incorrect) \(\pi_0\) slope line.
+But if this first part is linear, it still indicates that the extra set of decoys is representative for the mixture component of incorrect target PSMs. Since \(\pi_0\) is unknow in this case we set \(\pi_0\) to 1 (see <strong>FDR_BH</strong> in the next section).</p>
+
+<p>We can conclude from the above diagnostic plots that the large decoy set is an appropiate candiate set to estimate the incorrect subset target PSM distribution.</p>
+
+<h2>Estimating FDR on the subset of interest.</h2>
+
+<p>The output from &#39;preprocess()&#39; can be immediatly used to estimate the FDR in the PSM subset of interest.</p>
+
+<pre><code class="r">data_results = calculate_fdr(data_prep, score_higher = FALSE)
+glimpse(data_results)
+</code></pre>
+
+<pre><code>## Observations: 15,107
+## Variables: 13
+## $ spec_id       &lt;dbl&gt; 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14...
+## $ sequence      &lt;chr&gt; &quot;YEQIPWTQECSK&quot;, &quot;NVQQKWFGK&quot;, &quot;NLLESPKIK&quot;, &quot;KHLEQ...
+## $ decoy         &lt;lgl&gt; FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, TRUE, FA...
+## $ database      &lt;chr&gt; &quot;complete&quot;, &quot;complete&quot;, &quot;complete&quot;, &quot;complete&quot;, ...
+## $ database_size &lt;dbl&gt; 2051, 2051, 2051, 2051, 2051, 2051, 2051, 2051, ...
+## $ score         &lt;dbl&gt; 2.560707e-05, 1.458271e-04, 9.241630e-06, 1.7355...
+## $ subset        &lt;lgl&gt; FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, ...
+## $ non_subset    &lt;lgl&gt; TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,...
+## $ protein_id    &lt;chr&gt; &quot;Q8U285|Uncharacterized&quot;, &quot;Q8U168|Glycosyl&quot;, &quot;P8...
+## $ pi_0_cons     &lt;dbl&gt; 0.3653846, 0.3653846, 0.3653846, 0.3653846, 0.36...
+## $ FDR           &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ...
+## $ FDR_BH        &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ...
+## $ FDR_stable    &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ...
+</code></pre>
+
+<p>We can choose in the output from three different all-sub FDR estimations:
+The estimated stable FDR at this score cutoff for subset PSMs.</p>
+
+<ol>
+<li>FDR: Calculated according the classical TDA method. Does not work well small subsets.</li>
+<li>FDR_stable: Our improved FDR method which is more stable in small subsets. For large subsets, <em>FDR_stable</em> estimates will be close to <strong>FDR</strong> estimates.</li>
+<li>FDR_BH: Bejamini Hochberg FDR procedure. Use this when you have a large decoy set but no decoy information on the subset PSMs (e.g. when the search engine does not return decoy protein ids). This FDR estimate is more conservative then <strong>FDR</strong> and <strong>FDR_stable</strong>.</li>
+</ol>
+
+<p>The &#39;transferase activity&#39; subset is rather small with 104 target and 37 decoy PSMs.</p>
+
+<pre><code class="r">count(data_results, subset, decoy)
+</code></pre>
+
+<pre><code>## Source: local data frame [4 x 3]
+## Groups: subset [?]
+## 
+##   subset decoy     n
+##    &lt;lgl&gt; &lt;lgl&gt; &lt;int&gt;
+## 1  FALSE FALSE 13158
+## 2  FALSE  TRUE  1808
+## 3   TRUE FALSE   104
+## 4   TRUE  TRUE    37
+</code></pre>
+
+<p>From the diagnostic plots we concluded that the set of decoy PSMs from the complete search is a good candidate set to approximate the incorrect target PSM distribution.</p>
+
+<p>So, in this case it&#39;s recommended to use the more stable FDR estimates in <strong>FDR_stable</strong>.</p>
+
+<pre><code class="r">results_1_FDR = filter(data_results, subset, !decoy, FDR_stable &gt;= .01) 
+glimpse(results_1_FDR)
+</code></pre>
+
+<pre><code>## Observations: 31
+## Variables: 13
+## $ spec_id       &lt;dbl&gt; 85, 1361, 3519, 6026, 6857, 7516, 8462, 8490, 95...
+## $ sequence      &lt;chr&gt; &quot;YKGRGFRK&quot;, &quot;KLGENNER&quot;, &quot;FGTFLLTILTK&quot;, &quot;YKFKNNYR...
+## $ decoy         &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,...
+## $ database      &lt;chr&gt; &quot;complete&quot;, &quot;complete&quot;, &quot;complete&quot;, &quot;complete&quot;, ...
+## $ database_size &lt;dbl&gt; 2051, 2051, 2051, 2051, 2051, 2051, 2051, 2051, ...
+## $ score         &lt;dbl&gt; 5.231224e-05, 3.140562e-05, 7.486767e-06, 4.2052...
+## $ subset        &lt;lgl&gt; TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, ...
+## $ non_subset    &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,...
+## $ protein_id    &lt;chr&gt; &quot;Q8U164|Glycosyl&quot;, &quot;Q8U4L8|6,7-dimethyl-8-ribity...
+## $ pi_0_cons     &lt;dbl&gt; 0.3653846, 0.3653846, 0.3653846, 0.3653846, 0.36...
+## $ FDR           &lt;dbl&gt; 0.23333333, 0.17441860, 0.07317073, 0.21348315, ...
+## $ FDR_BH        &lt;dbl&gt; 0.63759109, 0.52501418, 0.21983740, 0.59408666, ...
+## $ FDR_stable    &lt;dbl&gt; 0.23296597, 0.19183210, 0.08032520, 0.21707013, ...
+</code></pre>
+
+<p>At 1\% FDR, we return 31 PSMs.</p>
+
+<h1>Example 2: Provide an external set of decoys {#example2}</h1>
+
+<h1>sessionInfo()</h1>
+
+<pre><code class="r">sessionInfo()
+</code></pre>
+
+<pre><code>## R version 3.3.3 (2017-03-06)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Arch Linux
+## 
+## locale:
+## [1] C
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+## [1] dplyr_0.5.0     knitr_1.15.1    saas_0.0.0.9000
+## 
+## loaded via a namespace (and not attached):
+##  [1] Rcpp_0.12.10        highr_0.6           compiler_3.3.3     
+##  [4] git2r_0.18.0        plyr_1.8.4          ProtGenerics_1.6.0 
+##  [7] tools_3.3.3         highlight_0.4.7.1   digest_0.6.12      
+## [10] pkgload_0.0.0.9000  memoise_1.0.0       evaluate_0.10      
+## [13] tibble_1.3.0        gtable_0.2.0        shiny_1.0.0        
+## [16] DBI_0.6             commonmark_1.2      parallel_3.3.3     
+## [19] curl_2.5            yaml_2.1.14         pkgdown_0.1.0.9000 
+## [22] withr_1.0.2         httr_1.2.1          stringr_1.2.0      
+## [25] roxygen2_6.0.1      xml2_1.1.1          hms_0.3            
+## [28] desc_1.1.0          devtools_1.12.0     cowplot_0.7.0      
+## [31] rprojroot_1.2       grid_3.3.3          Biobase_2.34.0     
+## [34] R6_2.2.0            rmarkdown_1.4       callr_1.0.0        
+## [37] readr_1.1.0         mzR_2.8.0           purrr_0.2.2        
+## [40] ggplot2_2.2.1       magrittr_1.5        whisker_0.3-2      
+## [43] codetools_0.2-15    BiocGenerics_0.20.0 backports_1.0.5    
+## [46] scales_0.4.1        htmltools_0.3.5     usethis_0.0.0.9000 
+## [49] assertthat_0.2.0    xtable_1.8-2        mime_0.5           
+## [52] colorspace_1.3-2    httpuv_1.3.3        labeling_0.3       
+## [55] stringi_1.1.5       lazyeval_0.2.0.9000 munsell_0.4.3      
+## [58] markdown_0.7.7      crayon_1.3.2
+</code></pre>
+
+</body>
+
+</html>
