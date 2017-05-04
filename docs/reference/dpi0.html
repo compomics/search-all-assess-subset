@@ -54,7 +54,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li>
-  <a href="../articles/saas.html">Tutorial</a>
+  <a href="../articles/saas.html">Vignette</a>
 </li>
       </ul>
       
@@ -115,8 +115,9 @@ Returns 'NaN' for 'pi0 &lt; 0' and 'pi &gt; 1'.</p>
 <span class='fu'>dpi0</span>(<span class='fl'>.5</span>, <span class='fl'>10</span>, <span class='fl'>3</span>)</div><div class='output co'>#&gt; [1] 1.176727</div><div class='input'>
 <span class='co'>## visualize the pi0 distribution when observing 10 targets and 3 decoys</span>
 <span class='no'>grid</span> <span class='kw'>=</span> <span class='fu'>seq</span>(<span class='fl'>0</span>,<span class='fl'>1</span>,<span class='fl'>.01</span>)
-<span class='no'>dens</span> <span class='kw'>=</span> <span class='fu'>dpi</span>(<span class='no'>grid</span>,<span class='fl'>10</span> , <span class='fl'>3</span>)</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): could not find function "dpi"</span></div><div class='input'><span class='fu'>plot</span>(<span class='no'>dens</span>, <span class='kw'>xlab</span> <span class='kw'>=</span> <span class='st'>'pi0'</span>, <span class='kw'>ylab</span> <span class='kw'>=</span> <span class='st'>'density'</span>)</div><div class='output co'>#&gt; <span class='error'>Error in plot(dens, xlab = "pi0", ylab = "density"): object 'dens' not found</span></div><div class='input'><span class='co'>##Alternatively, you can also use the function pi0plot()</span>
-<span class='fu'><a href='pi0plot.html'>pi0plot</a></span>(<span class='fl'>10</span>,<span class='fl'>3</span>)</div><img src='dpi0-8.png' alt='' width='540' height='400' /><div class='input'>
+<span class='no'>dens</span> <span class='kw'>=</span> <span class='fu'>dpi0</span>(<span class='no'>grid</span>,<span class='fl'>10</span> , <span class='fl'>3</span>)
+<span class='fu'>plot</span>(<span class='no'>dens</span>, <span class='kw'>xlab</span> <span class='kw'>=</span> <span class='st'>'pi0'</span>, <span class='kw'>ylab</span> <span class='kw'>=</span> <span class='st'>'density'</span>)</div><img src='dpi0-4.png' alt='' width='540' height='400' /><div class='input'><span class='co'>##Alternatively, you can also use the function pi0plot()</span>
+<span class='fu'><a href='pi0plot.html'>pi0plot</a></span>(<span class='fl'>10</span>,<span class='fl'>3</span>)</div><img src='dpi0-6.png' alt='' width='540' height='400' /><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
