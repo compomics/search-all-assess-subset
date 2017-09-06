@@ -24,17 +24,17 @@ In short, the basic all-sub workflow comprises the following steps:
 1. Remove all PSMs that match a protein you are not interesed in.
 1. Calculate the FDR on the resulting subset of PSMs.
 
-#A preprint of the manuscript on the search-all-assess FDR procedure can be found on bioRxiv ([https://doi.org/10.1101/094581](https://doi.org/10.1101/094581)).
-#
-#>Mass spectrometrists should search for all peptides, but assess only the ones they care about<br/>
-#>Adriaan Sticker, Lieven Clement, Lennart Martens [-@Sticker2017]
-#
-The search-all-assess-subset FDR procedure has been published in [Sticker et al. Nature Methods 14, 643–644 (2017) doi:10.1038/nmeth.4338](https://doi.org/10.1038/nmeth.4338)
+<!-- A preprint of the manuscript on the search-all-assess FDR procedure can be found on bioRxiv ([https://doi.org/10.1101/094581](https://doi.org/10.1101/094581)). -->
+
+<!-- >Mass spectrometrists should search for all peptides, but assess only the ones they care about<br/> -->
+<!-- >Adriaan Sticker, Lieven Clement, Lennart Martens [-@Sticker2017] -->
+
+The search-all-assess-subset FDR procedure has been published in [Sticker et al. Nature Methods 14, 643–644 (2017) doi:10.1038/nmeth.4338](https://doi.org/10.1038/nmeth.4338).
 
 Mass spectrometrists should search for all peptides, but assess only the ones they care about<br/>
 Adriaan Sticker, Lennart Martens, Lieven Clement [-@Sticker2017]
 
-Please include this reference if you usesearch-all-assess-subset FDR procedure as part of a publication.
+Please include this reference if you use search-all-assess-subset FDR procedure as part of a publication.
 
 ## False discovery rate (FDR) estimation
 Let $x$ be the PSM score and assume that larger score values indicate a better match to the theoretical spectrum.

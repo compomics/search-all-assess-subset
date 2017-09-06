@@ -5,7 +5,8 @@ An implementation of the Search All, Asses Subset strategy for FDR estimation in
 The search-all-assess-subset FDR procedure has been published in [Sticker et al. Nature Methods 14, 643–644 (2017) doi:10.1038/nmeth.4338](https://doi.org/10.1038/nmeth.4338)
 >Mass spectrometrists should search for all peptides, but assess only the ones they care about<br/>
 >(Adriaan Sticker, Lennart Martens, Lieven Clement)
-Please include this reference if you usesearch-all-assess-subset FDR procedure as part of a publication.
+
+Please include this reference if you use search-all-assess-subset FDR procedure as part of a publication.
 
 A user-friendly GUI version of saas is hosted [here](http://iomics.ugent.be/saas/).
 
