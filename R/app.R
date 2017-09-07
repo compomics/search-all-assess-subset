@@ -235,8 +235,9 @@ ui = function() fluidPage(
                                   ## tags$a(href = 'https://doi.org/10.1101/094581',
                                   ##        'https://doi.org/10.1101/094581')),
                                   'Publication: ',
-                                  tags$a(href = 'Sticker et al. Nature Methods 14, 643–644 (2017) doi:10.1038/nmeth.4338',
-                                         'https://doi.org/10.1038/nmeth.4338')),
+                                  tags$a(href = 'https://doi.org/10.1038/nmeth.4338',
+                                         'Sticker et al. Nature Methods 14, 643–644 (2017) doi:10.1038/nmeth.4338'
+                                         )),
  title =  'Search All, Assess Subset',
   tabPanel('Data input',
            sidebarLayout(
